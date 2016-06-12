@@ -731,7 +731,7 @@ class FakeTrade(object):
                 tzuhe.add_row([self.__baseday, k, key[0], stopwin, stoplos]) 
         print tzuhe
 
-        tzuhe = PrettyTable(['T日', '代码', '名称', '得分', '收益率', '持有天数', '开仓价', '止盈价', '止损价'])
+        tzuhe = PrettyTable(['T日', '代码', '名称', '得分', '收益率', '持有天数', '开仓价', '止盈价', '止损价', '手数'])
         tzuhe.float_format = '.4'
         tzuhe.align = 'l'
         nday = self.__baseday
