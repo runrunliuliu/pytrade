@@ -5,15 +5,15 @@ class dbexport:
 
     def __init__(self):
 
-        # db_user = 'hy'
-        # db_pass = '123456'
-        # db_url  = '192.168.100.101'
-        # dbname = 'stock'
+        db_user = 'hy'
+        db_pass = '123456'
+        db_url  = '192.168.100.101'
+        dbname = 'stock'
 
-        db_user = 'stock'
-        db_pass = '4r10nc8z2jg42al10'
-        db_url  = 'rdsnfvbb2j2m7bz.mysql.rds.aliyuncs.com'
-        dbname  = 'stock'
+        # db_user = 'stock'
+        # db_pass = '4r10nc8z2jg42al10'
+        # db_url  = 'rdsnfvbb2j2m7bz.mysql.rds.aliyuncs.com'
+        # dbname  = 'stock'
 
         self.conn = MySQLdb.connect(db_url,db_user,db_pass,dbname,charset='utf8')
 
