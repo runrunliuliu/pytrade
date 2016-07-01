@@ -123,6 +123,8 @@ class DumpFeature(object):
         self.__dropout = obj.getDropOut()
 
         self.__cxshort = obj.getCXshort()
+        
+        self.__qushi = obj.getQUSHI()
 
         self.__observed = obj.getObserved()
 
@@ -142,11 +144,15 @@ class DumpFeature(object):
         self.QSLine2csv(self.__nowdesc, 'ndes')
         self.QSLine2csv(self.__nowinc, 'ninc')
 
+        # 上升三角策略
         self.TradeSignal2csv('triangle', 0, 'trade')
         self.QS2csv('triangle', 0, 'qs')
         self.Drop2csv('triangle', 0, 'drop')
         self.Ob2csv('triangle', 0, 'ob')
         self.CX2csv('mtime')
+       
+        # 趋势线策略 
+        self.TradeSignal2csv('qushi', 1, 'trade')
 
     def CX2csv(self, subdir):
         dirs = self.__dir + '/' + subdir 
@@ -684,7 +690,7 @@ class FakeTrade(object):
                     (ret, comment, ref) = self.mtime(code, nday, tp, nxday)
         return (ret, comment, ref)
 
-    def initZUHE(self, dirs, subdir):
+    def initTriangleZUHE(self, dirs, subdir):
         qsline = {}
         zuhe  = {}
         ozuhe = []
@@ -703,8 +709,8 @@ class FakeTrade(object):
                     qsline[code] = (tmp[2],tmp[6])
         return (qsline, zuhe, ozuhe)
 
-    def select(self, dirs, subdir, forcetp):
-        (qsline, zuhe, ozuhe) = self.initZUHE(dirs, subdir)
+    def triangleSelect(self, dirs, subdir, forcetp):
+        (qsline, zuhe, ozuhe) = self.initTriangleZUHE(dirs, subdir)
         
         nday = self.__baseday
         self.updateBB(nday)
@@ -748,6 +754,12 @@ class FakeTrade(object):
             ftups.append(t)
         self.printNextDay(nday, ftups, tzuhe)
         print tzuhe
+
+    def select(self, dirs, subdir, forcetp, trade):
+        if trade == 'triangle':
+            self.triangleSelect(dirs, subdir, forcetp)
+        if trade == 'QUSHI':
+            self.qushiSelect(dirs, subdir, forcetp)
 
     def mock(self):
         start = self.__startday
