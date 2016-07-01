@@ -27,6 +27,7 @@ class MacdSeg(eventprofiler.Predicate):
 
         self.__cxshort  = [] 
         self.__observed = [] 
+        self.__qushi = []
 
         self.__ftDes = None
         self.__ftInc = None
@@ -36,6 +37,7 @@ class MacdSeg(eventprofiler.Predicate):
         self.__baseinfo = baseinfo
 
         self.__trianglesignal = OrderedDict() 
+        self.__qushisignal = OrderedDict() 
 
         self.__qsline = OrderedDict()
 
@@ -84,6 +86,9 @@ class MacdSeg(eventprofiler.Predicate):
     def getCXshort(self):
         return self.__cxshort
 
+    def getQUSHI(self):
+        return self.__qushi
+
     def handleTriangle(self, dateTime, triangle, inst, instname):
         rets = None
         score = triangle[0][0]
@@ -102,7 +107,7 @@ class MacdSeg(eventprofiler.Predicate):
         rets = (inst, instname, score, dprice, gprice, key)
         return rets
 
-    def buySignal(self, dateTime, inst, triangle):
+    def triangleBuySignal(self, dateTime, inst, triangle):
         ret = 0 
         if triangle is None:
             return ret 
@@ -115,9 +120,34 @@ class MacdSeg(eventprofiler.Predicate):
         arr.append(tups)
         arr = sorted(arr, key=itemgetter(2), reverse=True)
         self.__trianglesignal[dateTime] = arr 
+        return ret
+
+    def handleQUSHI(self, dateTime, qushi, inst, instname):
+        rets = None
+        score  = qushi[0]
+        dprice = 'NULL' 
+        gprice = 'NULL' 
+        key    = qushi[1] 
+
+        rets = (inst, instname, score, dprice, gprice, key)
+        return rets
+
+    def qushiBuySignal(self, dateTime, inst, qushi):
+        ret = 0 
+        if qushi is None:
+            return ret 
+        instname = self.__baseinfo.getName(inst) 
+        arr = []
+        if dateTime in self.__qushisignal:
+            arr = self.__qushisignal[dateTime]
+        tups = self.handleQUSHI(dateTime, qushi, inst, instname)
+        arr.append(tups)
+        arr = sorted(arr, key=itemgetter(2), reverse=True)
+        self.__qushisignal[dateTime] = arr 
+        return ret
 
     def getTradeSignal(self):
-        return (self.__trianglesignal,)
+        return (self.__trianglesignal, self.__qushisignal)
 
     def updateQSdiff(self, nbar, dateTime, dtzq):
         close = nbar.getClose()
@@ -159,6 +189,9 @@ class MacdSeg(eventprofiler.Predicate):
         cxshort  = self.__macd[instrument][-1][18]
         self.__cxshort.append((dateTime, cxshort))
 
+        qushi = self.__macd[instrument][-1][19]
+        self.__qushi.append((dateTime, qushi))
+
         self.__ftDes = self.__macd[instrument][-1][15]
         self.__ftInc = self.__macd[instrument][-1][16]
 
@@ -168,14 +201,15 @@ class MacdSeg(eventprofiler.Predicate):
         instroc  = self.__macd[instrument][-1][12]
         dtzq     = self.__macd[instrument][-1][13]
         
-        ret = self.buySignal(dateTime, instrument, triangle)
+        ret1 = self.triangleBuySignal(dateTime, instrument, triangle)
+        ret2 = self.qushiBuySignal(dateTime, instrument, qushi)
 
         self.updateQSdiff(bards[-1], dateTime, dtzq)
 
         self.__roc[instrument] = instroc
 
         if vbeili == 1:
-            print "EVENT OK", dateTime, instrument
+            print "EVENT OK", dateTime, instrument, ret1, ret2
             ret = True
         return ret
 #
