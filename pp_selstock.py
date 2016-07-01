@@ -129,12 +129,16 @@ def main(argv):
     if mode == 'stock':
         subdir  = ''
         strat   = None
-        forcetp = 7
+        forcetp = -1 
         if trade == 'triangle':
+            forcetp = 7
             subdir = 'triangle'
             strat = triangle(startday, baseday, codearr, dirs, forcetp)
+        if trade == 'QUSHI':
+            subdir = 'qushi'
+            strat = qushi(startday, baseday, codearr, dirs, forcetp)
         ft = utils.FakeTrade(codearr, dirs, startday, baseday, strat, forcetp)
-        ft.select(dirs, subdir, forcetp)
+        ft.select(dirs, subdir, forcetp, trade)
 
 if __name__ == "__main__":
     main(sys.argv[1:])
