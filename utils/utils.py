@@ -690,27 +690,8 @@ class FakeTrade(object):
                     (ret, comment, ref) = self.mtime(code, nday, tp, nxday)
         return (ret, comment, ref)
 
-    def initTriangleZUHE(self, dirs, subdir):
-        qsline = {}
-        zuhe  = {}
-        ozuhe = []
-        for line in open('./data/zuhe.txt'):
-            arr = line.strip().split(' ')
-            zuhe[arr[2]] = arr[0]
-            ozuhe.append(arr[2])
-            code  = arr[2]
-            fname = dirs + '/' + subdir + '/' + code + '.trade.csv'
-            if os.path.isfile(fname) is False:
-                return
-            for line in open(fname):
-                tmp  = line.strip().split(',')
-                day  = tmp[0]
-                if day == zuhe[code]:
-                    qsline[code] = (tmp[2],tmp[6])
-        return (qsline, zuhe, ozuhe)
-
     def triangleSelect(self, dirs, subdir, forcetp):
-        (qsline, zuhe, ozuhe) = self.initTriangleZUHE(dirs, subdir)
+        (qsline, zuhe, ozuhe) = self.__trade.initZUHE(dirs, subdir)
         
         nday = self.__baseday
         self.updateBB(nday)
@@ -754,6 +735,44 @@ class FakeTrade(object):
             ftups.append(t)
         self.printNextDay(nday, ftups, tzuhe)
         print tzuhe
+
+    def qushiClassiz(self, tups):
+        buys  = []
+        holds = []
+        sells = []
+
+        for t in tups:
+            if t[5] == '1':
+                buys.append(t)
+            if t[5] == '0':
+                holds.append(t)
+            if t[5] == '-1':
+                sells.append(t)
+        return (buys, holds, sells)
+
+    def qushiDump(self, buys, holds, sells):
+        nday = self.__baseday
+        f = open('./output/' + nday + '.qushi.csv', 'w')
+        def dump(f, arr, act):
+            for i in arr:
+                print i
+                tmp = i[1]
+                out = i[0] + ',' + tmp + ',' + act
+                f.write(out)
+                f.write('\n')
+        dump(f, buys, 'BUY')
+        dump(f, holds, 'HOLD')
+        dump(f, sells, 'SELL')
+        f.close()
+
+    def qushiSelect(self, dirs, subdir, forcetp):
+        (zuhe, ozuhe) = self.__trade.initZUHE(dirs, subdir, forcetp)
+        nday = self.__baseday
+        tups  = self.__tradesignal[nday] 
+
+        # FINAL OUTPUT
+        (buys, holds, sells) = self.qushiClassiz(tups)
+        self.qushiDump(buys, holds, sells)
 
     def select(self, dirs, subdir, forcetp, trade):
         if trade == 'triangle':
