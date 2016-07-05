@@ -13,7 +13,7 @@ class qushi(mockbase):
         self.__stopwin = 1.10
         self.__stoplos = 0.92
 
-        super(triangle,self).__init__(startday, baseday)
+        super(qushi,self).__init__(startday, baseday)
 
         self.__dropout     = {}
         self.__observed    = {}
@@ -33,7 +33,7 @@ class qushi(mockbase):
             if len(fsize) > 2:
                 continue
             code  = fname[0:8]
-            self.loadMtime(dirs, code)
+            self.loadTrades(dirs, subdir, code)
 
     def setStop(self, win, loss):
         self.__stopwin = win
@@ -48,6 +48,16 @@ class qushi(mockbase):
         self.__hiset    = hi
         self.__lwset    = lw
         self.__lastdayk = lastdayk
+
+    def initZUHE(self, dirs, subdir, forcetp):
+        zuhe     = {}
+        ozuhe    = []
+        for line in open('./data/zuhe.txt'):
+            arr = line.strip().split(' ')
+            zuhe[arr[2]] = arr[0]
+            ozuhe.append(arr[2])
+            code  = arr[2]
+        return (zuhe, ozuhe)
 
     def buy(self, tup, nxday, nday, tp):
         buyprice = None
