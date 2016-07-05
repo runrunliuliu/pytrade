@@ -23,6 +23,7 @@ from events import macdseg
 from pyalgotrade import eventprofiler
 from pyalgotrade.utils import instinfo 
 from mock.triangle import triangle 
+from mock.qushi import qushi
 from mock.select import select 
 
 
