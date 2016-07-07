@@ -17,13 +17,12 @@ db = dbexport()
 # pe.compute()
 
 match = set()
-match.add('SZ300315')
+# match.add('SZ300315')
+# 
+# yd = YD(db,timeutils,'data/yidong.txt',match)
+# yddf = yd.compute()
+# yddf.to_csv('data/yd.csv.out', sep=',', encoding='utf-8',index=False)
 
-yd = YD(db,timeutils,'data/yidong.txt',match)
-yddf = yd.compute()
-yddf.to_csv('data/yd.csv.out', sep=',', encoding='utf-8',index=False)
-
-exit()
 dt = DT(db,timeutils,'data/dtboard.csv',match)
 dtdf = dt.compute()
 
