@@ -125,6 +125,7 @@ class DumpFeature(object):
         self.__cxshort = obj.getCXshort()
         
         self.__qushi = obj.getQUSHI()
+        self.__dt    = obj.getDT()
 
         self.__observed = obj.getObserved()
 
@@ -153,6 +154,9 @@ class DumpFeature(object):
        
         # 趋势线策略 
         self.TradeSignal2csv('qushi', 1, 'trade')
+        
+        # 龙虎榜策略 
+        self.TradeSignal2csv('dtboard', 2, 'trade')
 
     def CX2csv(self, subdir):
         dirs = self.__dir + '/' + subdir 
@@ -755,7 +759,6 @@ class FakeTrade(object):
         f = open('./output/' + nday + '.qushi.csv', 'w')
         def dump(f, arr, act):
             for i in arr:
-                print i
                 tmp = i[1]
                 out = i[0] + ',' + tmp + ',' + act
                 f.write(out)
