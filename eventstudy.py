@@ -14,6 +14,7 @@ from events import timeHit
 from events import qszt 
 from events import chaodie 
 from events import yidong 
+from events import qushi 
 from events import macdseg 
 from pyalgotrade.plots import hist
 import datetime
@@ -73,12 +74,13 @@ def main(plot):
     # predicate = qszt.QingShiZT(feed)
     # predicate = chaodie.ChaoDie(feed, ts)
     # predicate = yidong.YiDong(feed, ts)
-    predicate = macdseg.MacdSeg(feed, baseinfo)
+    # predicate = macdseg.MacdSeg(feed, baseinfo)
+    predicate = qushi.QUSHI(feed, fs)
 
     eventProfiler = eventprofiler.Profiler(predicate, 1, 20)
     eventProfiler.run(feed, 1, True)
 
-    predicate.tradeInfo()
+    # predicate.tradeInfo()
 
     results = eventProfiler.getResults()
     print "%d events found" % (results.getEventCount())
