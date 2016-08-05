@@ -1,3 +1,5 @@
+import sys
+import getopt
 from pyalgotrade import eventprofiler
 from pyalgotrade.technical import stats
 from pyalgotrade.technical import roc
@@ -20,6 +22,7 @@ import pandas as pd
 from utils import utils
 from pyalgotrade.utils import instinfo 
 from mock.triangle import triangle 
+from pyalgotrade import bar
 
 
 def parseinst(codearr, bk='ALL'):
@@ -39,7 +42,22 @@ def parseinst(codearr, bk='ALL'):
     return out
 
 
-def main(plot):
+def main(plot, argv):
+
+    # Get Parameters
+    period = 'day'
+    try:
+        opts, args = getopt.getopt(argv,"h:p:",["day="])
+    except getopt.GetoptError:
+        print 'test.py -d <time>'
+        sys.exit(2)
+    for opt, arg in opts:
+        if opt == '-h':
+            print 'test.py -t <time> -o <outputfile>'
+            sys.exit()
+        elif opt in ("-p", "--period"):
+            period = arg
+
     fromMonth = 1 
     fromDay   = 1
     toMonth   = 2
@@ -49,11 +67,19 @@ def main(plot):
     barFilter  = csvfeed.CHINAEquitiesRTH(start_time,end_time)
     baseinfo = instinfo.InstrumentInfo('data/stockinfo.csv')
 
+    freq = bar.Frequency.DAY
     dirpath = './data/dayk/'
+    if period == 'week':
+        dirpath = './data/week/'
+        freq = bar.Frequency.WEEK
+    if period == 'month':
+        dirpath = './data/monk/'
+        freq = bar.Frequency.MONTH
+
     fs = FileUtils('','','')
     codearr = fs.os_walk(dirpath)
     fncodearr = parseinst(codearr,'ALL') 
-    feed = yahoofeed.Feed()
+    feed = yahoofeed.Feed(frequency=freq)
     
     instfiles = fncodearr 
     # instfiles = [("SH600007.csv","SH600007"),("SZ002333.csv","SZ002333")]
@@ -65,21 +91,23 @@ def main(plot):
     # instfiles = [("SZ000540.csv","SZ000540")]
     # instfiles = [("SZ300346.csv","SZ300346")]
     # instfiles = [("SZ300358.csv","SZ300358")]
-    # instfiles = [("SZ000677.csv","SZ000677")]
+    # instfiles = [("SZ000961.csv","SZ000961")]
     # instfiles = [("SH600069.csv","SH600069")]
     # instfiles = [("SH600737.csv","SH600737")]
-    # instfiles = [("SH601328.csv","SH601328")]
-    # instfiles = [("SH600395.csv","SH600395")]
+    # instfiles = [("SH603799.csv","SH603799")]
+    instfiles = [("SH600784.csv","SH600784")]
     # instfiles = [("SH600666.csv","SH600666")]
     # instfiles = [("SH600502.csv","SH600502")]
-    # instfiles = [("SH600383.csv","SH600383")]
-    # instfiles = [("SH600706.csv","SH600706")]
-    # instfiles = [("SH601069.csv","SH601069")]
-    instfiles = [("SZ002040.csv","SZ002040")]
-    # instfiles = [("SZ300104.csv","SZ300104")]
-    # instfiles = [("SZ000876.csv","SZ000876")]
-    # instfiles = [("SZ300098.csv","SZ300098")]
-    # instfiles = [("SH601069.csv","SH601069")]
+    # instfiles = [("SH600486.csv","SH600486")]
+    # instfiles = [("SH601668.csv","SH601668")]
+    # instfiles = [("SH603799.csv","SH603799")]
+    # instfiles = [("SZ000002.csv","SZ000002")]
+    # instfiles = [("SZ002761.csv","SZ002761")]
+    # instfiles = [("SZ000961.csv","SZ000961")]
+    # instfiles = [("SZ000413.csv","SZ000413")]
+    # instfiles = [("SZ300122.csv","SZ300122")]
+    # instfiles = [("SH600993.csv","SH600993")]
+    # instfiles = [("SH600848.csv","SH600848")]
     # instfiles = [("ZS000001.csv","ZS000001")]
     # instfiles = [("ZS399006.csv","ZS399006")]
     insts  = [] 
@@ -110,4 +138,4 @@ def main(plot):
 
 
 if __name__ == "__main__":
-    main(True)
+    main(True, sys.argv[1:])
