@@ -158,6 +158,9 @@ class DumpFeature(object):
         # 龙虎榜策略 
         self.TradeSignal2csv('dtboard', 2, 'trade')
 
+        # NBS策略 
+        self.TradeSignal2csv('nbs', 3, 'trade')
+
     def CX2csv(self, subdir):
         dirs = self.__dir + '/' + subdir 
         if not os.path.exists(dirs):
