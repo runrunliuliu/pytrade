@@ -16,6 +16,7 @@ from events import chaodie
 from events import yidong 
 from events import qushi 
 from events import macdseg 
+from events import sarevent 
 from pyalgotrade.plots import hist
 import datetime
 from pyalgotrade.barfeed import csvfeed
@@ -55,7 +56,7 @@ def main(plot):
     # instfiles = [("SH601388.csv","601388")]
     # instfiles = [("SZ000001.csv","SZ000001")]
     # instfiles = [("SZ300301.csv","300301")]
-    # instfiles = [("SH600257.csv","600257")]
+    instfiles = [("SH600116.csv","SH600116")]
     insts = [] 
     for ele in instfiles:
         inst  = ele[1]
@@ -75,7 +76,8 @@ def main(plot):
     # predicate = chaodie.ChaoDie(feed, ts)
     # predicate = yidong.YiDong(feed, ts)
     # predicate = macdseg.MacdSeg(feed, baseinfo)
-    predicate = qushi.QUSHI(feed, fs)
+    # predicate = qushi.QUSHI(feed, fs)
+    predicate = sarevent.SAREVENT(feed, fs)
 
     eventProfiler = eventprofiler.Profiler(predicate, 1, 20)
     eventProfiler.run(feed, 1, True)
