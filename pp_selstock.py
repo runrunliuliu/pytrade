@@ -27,7 +27,7 @@ from mock.qushi import qushi
 from mock.select import select 
 
 
-def runstrategy(index,fncodearr,div):
+def runstrategy(index,fncodearr,div, dirpath, freq):
 
     start = div[index][0]
     end   = div[index][1]
@@ -45,9 +45,8 @@ def runstrategy(index,fncodearr,div):
         barFilter  = csvfeed.CHINAEquitiesRTH(start_time,end_time)
 
         baseinfo = instinfo.InstrumentInfo('data/stockinfo.csv')
-        dirpath = './data/dayk/'
         instfiles = [fncodearr[i]] 
-        feed = yahoofeed.Feed()
+        feed = yahoofeed.Feed(frequency=freq)
 
         path = None
         market = marketsession.CHASE()
@@ -70,8 +69,9 @@ def main(argv):
     baseday  = '2016-04-15'
     mode     = 'full'
     trade    = ''
+    period   = 'day'
     try:
-        opts, args = getopt.getopt(argv,"h:d:s:m:t:",["day="])
+        opts, args = getopt.getopt(argv,"h:d:s:m:t:p:",["day="])
     except getopt.GetoptError:
         print 'test.py -d <time>'
         sys.exit(2)
@@ -90,14 +90,25 @@ def main(argv):
             mode     = arg
         elif opt in ("-t", "--trade"):
             trade    = arg
+        elif opt in ("-p", "--period"):
+            period   = arg
 
     fs   = FileUtils('','','')
-    dirs = './data/dayk'
-    cores = 32
+
+    freq = bar.Frequency.DAY
+    dirs = './data/dayk/'
+    if period == 'week':
+        dirs = './data/week/'
+        freq = bar.Frequency.WEEK
+    if period == 'month':
+        dirs = './data/monk/'
+        freq = bar.Frequency.MONTH
+
+    cores = 4 
     codearr = fs.os_walk(dirs)
 
     if mode == 'full' or mode == 'train':
-        fncodearr = utils.parseinst(codearr, bk='ALL') 
+        fncodearr = utils.parseinst(codearr, bk='TEST') 
         div   = dict()
         block = len(fncodearr) / cores 
         left  = len(fncodearr) % cores 
@@ -109,7 +120,7 @@ def main(argv):
         div[cores - 1] = (div[cores - 1][0],end)
 
         # Setup a list of processes that we want to run
-        processes = [mp.Process(target=runstrategy, args=(x,fncodearr,div)) for x in range(cores)]
+        processes = [mp.Process(target=runstrategy, args=(x,fncodearr,div, dirs, freq)) for x in range(cores)]
         
         # Run processes
         for p in processes:
