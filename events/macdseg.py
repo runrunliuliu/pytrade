@@ -29,6 +29,7 @@ class MacdSeg(eventprofiler.Predicate):
         self.__observed = [] 
         self.__qushi = []
         self.__dt = []
+        self.__nbs = []
 
         self.__ftDes = None
         self.__ftInc = None
@@ -40,7 +41,7 @@ class MacdSeg(eventprofiler.Predicate):
         self.__trianglesignal = OrderedDict() 
         self.__qushisignal = OrderedDict() 
         self.__dtsignal = OrderedDict() 
-
+        self.__nbsignal = OrderedDict()
         self.__qsline = OrderedDict()
 
         self.__qs = []
@@ -175,8 +176,32 @@ class MacdSeg(eventprofiler.Predicate):
         self.__dtsignal[dateTime] = arr 
         return ret
 
+    # ----------- NBS -----------------------#
+    def handleNBS(self, dateTime, NBS, inst, instname):
+        rets = None
+        score  =  NBS[1]
+        dprice = 'NULL' 
+        gprice = 'NULL' 
+        key    =  NBS[0] 
+        rets = (inst, instname, score, dprice, gprice, key)
+        return rets
+
+    def nbsBuySignal(self, dateTime, inst, NBS):
+        ret = 0 
+        if NBS is None:
+            return ret 
+        instname = self.__baseinfo.getName(inst) 
+        arr = []
+        if dateTime in self.__nbsignal:
+            arr = self.__nbsignal[dateTime]
+        tups = self.handleNBS(dateTime, NBS, inst, instname)
+        arr.append(tups)
+        arr = sorted(arr, key=itemgetter(2), reverse=True)
+        self.__nbsignal[dateTime] = arr 
+        return ret
+
     def getTradeSignal(self):
-        return (self.__trianglesignal, self.__qushisignal, self.__dtsignal)
+        return (self.__trianglesignal, self.__qushisignal, self.__dtsignal, self.__nbsignal)
 
     def updateQSdiff(self, nbar, dateTime, dtzq):
         close = nbar.getClose()
@@ -224,6 +249,9 @@ class MacdSeg(eventprofiler.Predicate):
         dt = self.__macd[instrument][-1][20]
         self.__dt.append((dateTime, dt))
 
+        NBS = self.__macd[instrument][-1][21]
+        self.__nbs.append((dateTime, NBS))
+
         self.__ftDes = self.__macd[instrument][-1][15]
         self.__ftInc = self.__macd[instrument][-1][16]
 
@@ -235,7 +263,8 @@ class MacdSeg(eventprofiler.Predicate):
         
         ret1 = self.triangleBuySignal(dateTime, instrument, triangle)
         ret2 = self.qushiBuySignal(dateTime, instrument, qushi)
-        ret2 = self.dtBuySignal(dateTime, instrument, dt)
+        ret3 = self.dtBuySignal(dateTime, instrument, dt)
+        ret4 = self.nbsBuySignal(dateTime, instrument, NBS)
 
         # print 'DEBUG', dateTime, self.__dtsignal
 
@@ -244,7 +273,7 @@ class MacdSeg(eventprofiler.Predicate):
         self.__roc[instrument] = instroc
 
         if vbeili == 1:
-            print "EVENT OK", dateTime, instrument, ret1, ret2
+            print "EVENT OK", dateTime, instrument, ret1, ret2, ret3, ret4
             ret = True
         return ret
 #
