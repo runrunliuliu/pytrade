@@ -28,7 +28,7 @@ from mock.qushi import qushi
 from mock.select import select 
 
 
-def runstrategy(index,fncodearr,div):
+def runstrategy(index, fncodearr, div, period):
 
     start = div[index][0]
     end   = div[index][1]
@@ -58,18 +58,21 @@ def runstrategy(index,fncodearr,div):
         feed.addBarsFromCSV(inst, path,market=market)
 
         # MergeTo MONK
-        frequency = bar.Frequency.MONTH
-        resample.resample_to_csv(feed, frequency, './data/monk/' + inst + '.csv')
+        if period == 'month':
+            frequency = bar.Frequency.MONTH
+            resample.resample_to_csv(feed, frequency, './data/monk/' + inst + '.csv')
         
         # MergeTo DayK
-        # frequency = bar.Frequency.WEEK
-        # resample.resample_to_csv(feed, frequency, './data/week/' + inst + '.csv')
+        if period == 'week':
+            frequency = bar.Frequency.WEEK
+            resample.resample_to_csv(feed, frequency, './data/week/' + inst + '.csv')
 
 
 def main(argv):
     mode     = 'full'
+    period   = 'day'
     try:
-        opts, args = getopt.getopt(argv,"h:d:s:m:t:",["day="])
+        opts, args = getopt.getopt(argv,"h:d:s:m:t:p:",["day="])
     except getopt.GetoptError:
         print 'test.py -d <time>'
         sys.exit(2)
@@ -78,11 +81,13 @@ def main(argv):
             print 'test.py -t <time> -o <outputfile>'
             sys.exit()
         elif opt in ("-m", "--mode"):
-            mode = arg
+            mode   = arg
+        elif opt in ("-p", "--period"):
+            period = arg
 
     fs   = FileUtils('','','')
     dirs = './data/dayk'
-    cores = 4 
+    cores = 32 
     codearr = fs.os_walk(dirs)
 
     if mode == 'full' or mode == 'train':
@@ -98,7 +103,7 @@ def main(argv):
         div[cores - 1] = (div[cores - 1][0],end)
 
         # Setup a list of processes that we want to run
-        processes = [mp.Process(target=runstrategy, args=(x,fncodearr,div)) for x in range(cores)]
+        processes = [mp.Process(target=runstrategy, args=(x, fncodearr, div, period)) for x in range(cores)]
         
         # Run processes
         for p in processes:
