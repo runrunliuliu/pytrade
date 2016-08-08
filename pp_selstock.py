@@ -104,11 +104,11 @@ def main(argv):
         dirs = './data/monk/'
         freq = bar.Frequency.MONTH
 
-    cores = 4 
+    cores = 32
     codearr = fs.os_walk(dirs)
 
     if mode == 'full' or mode == 'train':
-        fncodearr = utils.parseinst(codearr, bk='TEST') 
+        fncodearr = utils.parseinst(codearr, bk='ALL') 
         div   = dict()
         block = len(fncodearr) / cores 
         left  = len(fncodearr) % cores 
