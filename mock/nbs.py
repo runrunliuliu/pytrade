@@ -10,14 +10,13 @@ class NBS(mockbase):
 
     def __init__(self, startday, baseday, codearr, dirs, forcetp):
 
-        self.__stopwin = 1.10
-        self.__stoplos = 0.92
+        self.__stopwin = 1.20
+        self.__stoplos = 0.90
 
         super(NBS, self).__init__(startday, baseday)
 
         self.__dropout     = {}
         self.__observed    = {}
-        self.__qspred      = {}
         self.__qs          = {}
         self.__opset       = {} 
         self.__clset       = {}
@@ -90,9 +89,7 @@ class NBS(mockbase):
         return buyprice 
   
     def pred(self, pkey):
-        ret = None
-        if pkey in self.__qspred:
-            ret = float(self.__qspred[pkey])
+        ret = 0.0 
         return ret
 
     def filter(self, key):
@@ -122,5 +119,30 @@ class NBS(mockbase):
 
     def sell(self, tup, tday, nxday, instlast, baseday=None):
         sellprice = None
+        bp = tup[2]
+
+        tup  = tup[1]
+        inst = tup[0]
+        if nxday is None:
+            return sellprice
+        skey = inst + '|' + nxday
+        if skey not in self.__hiset:
+            skey = inst + '|' + self.__lastdayk[inst]
+        high = float(self.__hiset[skey])
+
+        ops  = float(self.__opset[skey])
+        low  = float(self.__lwset[skey])
+
+        # 止盈止损
+        pred = bp 
+        if high > pred * self.__stopwin:
+            sellprice = pred * self.__stopwin
+            if sellprice < ops:
+                sellprice = ops
+        if low  < pred * self.__stoplos:
+            sellprice = pred * self.__stoplos
+            if sellprice > ops:
+                sellprice = ops
+
         return sellprice
 # 
