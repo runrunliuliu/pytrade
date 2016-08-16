@@ -301,8 +301,8 @@ class FakeTrade(object):
         self.__zuhe   = []
         self.__switch = []
 
-        self.__stopwin = 1.10
-        self.__stoplos = 0.92
+        self.__stopwin = 1.20
+        self.__stoplos = 0.90
 
         self.__bearstopwin = 1.05
         self.__bearstoplos = 0.92
@@ -471,7 +471,7 @@ class FakeTrade(object):
             (yday, nxday) = self.getDays(z[1][0], nday)
             buy    = z[2]
             shares = z[3]
-            sp  = self.sell(z[1], nday, nxday)
+            sp  = self.sell(z, nday, nxday)
 
             (ret, comment, ref) = self.forceDrop(z[1], nday, forcetp + 1, nxday)
             if ret > 0:
