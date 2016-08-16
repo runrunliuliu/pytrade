@@ -7,7 +7,7 @@ class dbexport:
 
         db_user = 'hy'
         db_pass = '123456'
-        db_url  = '192.168.100.101'
+        db_url  = '192.168.200.30'
         dbname = 'stock'
 
         # db_user = 'stock'
