@@ -672,7 +672,7 @@ class FakeTrade(object):
         comment = ''
         ref     = -1
         code    = tup[0]
-        # tp = [1,2] --- mtime
+        # tp = [1,2] --- qs mtime
         # tp = [3,4] --- qs sell
         # tp = [5,6] --- 上证择时
         # tp = [7,8] --- qs择时,先做上证择时
@@ -786,6 +786,7 @@ class FakeTrade(object):
         if trade == 'QUSHI':
             self.qushiSelect(dirs, subdir, forcetp)
 
+    # ------------------ MAIN MODULE ---------------------------------- ##############
     def mock(self):
         start = self.__startday
         end   = self.__baseday
