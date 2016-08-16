@@ -24,6 +24,7 @@ from pyalgotrade import eventprofiler
 from pyalgotrade.utils import instinfo 
 from mock.triangle import triangle 
 from mock.qushi import qushi
+from mock.nbs import NBS 
 from mock.select import select 
 
 
@@ -132,9 +133,12 @@ def main(argv):
 
     if mode == 'full' or mode == 'mock':
         strat   = None
-        forcetp = 7
         if trade == 'triangle':
+            forcetp = 7
             strat = triangle(startday, baseday, codearr, dirs, forcetp)
+        if trade == 'nbs':
+            forcetp = 9 
+            strat = NBS(startday, baseday, codearr, dirs, forcetp)
         ft = utils.FakeTrade(codearr, dirs, startday, baseday, strat, forcetp)
         ft.mock()
 
