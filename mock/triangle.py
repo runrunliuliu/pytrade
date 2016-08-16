@@ -217,6 +217,7 @@ class triangle(mockbase):
 
     def sell(self, tup, tday, nxday, instlast, baseday=None):
         sellprice = None
+        tup  = tup[1]
         inst = tup[0]
         if baseday is not None:
             skey = inst + '|' + baseday
