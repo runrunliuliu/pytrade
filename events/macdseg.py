@@ -1,3 +1,4 @@
+# coding:utf-8
 from pyalgotrade import eventprofiler
 from pyalgotrade.technical import stats
 from pyalgotrade.technical import roc
@@ -188,7 +189,8 @@ class MacdSeg(eventprofiler.Predicate):
 
     def nbsBuySignal(self, dateTime, inst, NBS):
         ret = 0 
-        if NBS is None:
+        # 过滤掉空信号和buy＝0的信号
+        if NBS is None or NBS[0] == 0:
             return ret 
         instname = self.__baseinfo.getName(inst) 
         arr = []
@@ -199,6 +201,7 @@ class MacdSeg(eventprofiler.Predicate):
         arr = sorted(arr, key=itemgetter(2), reverse=True)
         self.__nbsignal[dateTime] = arr 
         return ret
+    # ----------- NBS END -----------------------#
 
     def getTradeSignal(self):
         return (self.__trianglesignal, self.__qushisignal, self.__dtsignal, self.__nbsignal)
