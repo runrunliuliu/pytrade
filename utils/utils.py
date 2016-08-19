@@ -168,7 +168,7 @@ class DumpFeature(object):
         f = open(dirs + '/' + self.__inst[0][1] + '.cxshort.csv', 'w')
         f.write('Date,cdif,cdea,Bear,cxShort,wsma5,yby,gfbl,gfscore,' + \
                 'xingtai,vret,vscore,nvpos,pret,pscore,nppos,slope,'  + \
-                'dma250,pma250,prext,tkdk,tkdf\n')
+                'dma250,pma250,prext,tkdk,tkdf,ma20GD\n')
         for cx in self.__cxshort:
             k = cx[0]
             v = cx[1]
@@ -301,13 +301,13 @@ class FakeTrade(object):
         self.__zuhe   = []
         self.__switch = []
 
-        self.__stopwin = 1.20
-        self.__stoplos = 0.90
+        self.__stopwin = 1.05
+        self.__stoplos = 0.97
 
         self.__bearstopwin = 1.05
         self.__bearstoplos = 0.92
 
-        self.__maxbuy  = 2
+        self.__maxbuy  = 10 
         self.__forcetp = forcetp 
 
         self.__cashbase  = 300000
