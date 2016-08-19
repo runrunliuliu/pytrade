@@ -180,11 +180,11 @@ class MacdSeg(eventprofiler.Predicate):
     # ----------- NBS -----------------------#
     def handleNBS(self, dateTime, NBS, inst, instname):
         rets = None
-        score  =  NBS[1]
-        dprice = 'NULL' 
-        gprice = 'NULL' 
-        key    =  NBS[0] 
-        rets = (inst, instname, score, dprice, gprice, key)
+        score  = NBS[1]
+        tprice = NBS[2] 
+        gprice = NBS[3] 
+        key    = NBS[0] 
+        rets = (inst, instname, score, tprice, gprice, key)
         return rets
 
     def nbsBuySignal(self, dateTime, inst, NBS):
