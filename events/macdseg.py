@@ -190,7 +190,7 @@ class MacdSeg(eventprofiler.Predicate):
     def nbsBuySignal(self, dateTime, inst, NBS):
         ret = 0 
         # 过滤掉空信号和buy＝0的信号
-        if NBS is None or NBS[0] == 0:
+        if NBS is None or NBS[0] % 10 == 0:
             return ret 
         instname = self.__baseinfo.getName(inst) 
         arr = []
