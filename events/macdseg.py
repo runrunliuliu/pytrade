@@ -1,4 +1,10 @@
 # coding:utf-8
+import logging
+import logging.config
+import logging.handlers
+import logutils
+from logutils.queue import QueueHandler, QueueListener
+from multiprocessing import Process, Queue
 from pyalgotrade import eventprofiler
 from pyalgotrade.technical import stats
 from pyalgotrade.technical import roc
@@ -15,7 +21,13 @@ from operator import itemgetter
 
 class MacdSeg(eventprofiler.Predicate):
 
-    def __init__(self, feed, baseinfo):
+    def __init__(self, feed, baseinfo, queue):
+
+        qh = logutils.queue.QueueHandler(queue)
+        root = logging.getLogger()
+        root.setLevel(logging.DEBUG)
+        root.addHandler(qh)
+
         self.__macd = {}
         self.__roc  = {}
         self.__gd   = None
