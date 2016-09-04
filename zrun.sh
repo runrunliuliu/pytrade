@@ -7,7 +7,8 @@ day0=`date +"%Y-%m-%d"`
 echo $day0
 
 ###--- DOWNLOAD DT_BOARD
-scp himalayas@139.129.99.51:/home/himalayas/apps2/qts/pytrade2/data/dtboard.csv ./data/ 
+# scp himalayas@139.129.99.51:/home/himalayas/apps2/qts/pytrade2/data/dtboard.csv ./data/ 
+rsync -uhavzm --stats --progress himalayas@139.129.99.51:/home/himalayas/apps2/qts/pytrade2/data/dtboard.csv ./data/
 
 ###--- 计算龙虎榜
 $py indicator.py
