@@ -1,6 +1,10 @@
 import sys
 import getopt
+import json
+import threading
+from conf import log
 import multiprocessing as mp
+from multiprocessing import Process, Queue
 from pyalgotrade import strategy
 from pyalgotrade import plotterBokeh
 from pyalgotrade.tools import yahoofinance
@@ -26,9 +30,21 @@ from mock.triangle import triangle
 from mock.qushi import qushi
 from mock.nbs import NBS 
 from mock.select import select 
+import logging
+import logging.config
+import logging.handlers
 
 
-def runstrategy(index,fncodearr,div, dirpath, freq):
+def logger_thread(q):
+    while True:
+        record = q.get()
+        if record is None:
+            break
+        logger = logging.getLogger(record.name)
+        logger.handle(record)
+
+
+def runstrategy(index,fncodearr,div, dirpath, freq, q):
 
     start = div[index][0]
     end   = div[index][1]
@@ -56,7 +72,7 @@ def runstrategy(index,fncodearr,div, dirpath, freq):
 
         feed.addBarsFromCSV(inst, path,market=market)
 
-        predicate = macdseg.MacdSeg(feed, baseinfo)
+        predicate = macdseg.MacdSeg(feed, baseinfo, q)
 
         eventProfiler = eventprofiler.Profiler(predicate, 1, 1)
         eventProfiler.run(feed, 2, True)
@@ -105,6 +121,10 @@ def main(argv):
         dirs = './data/monk/'
         freq = bar.Frequency.MONTH
 
+    # LOG CONFIGURE
+    q = Queue()
+    logging.config.dictConfig(log.d)
+
     cores = 32
     codearr = fs.os_walk(dirs)
 
@@ -121,15 +141,21 @@ def main(argv):
         div[cores - 1] = (div[cores - 1][0],end)
 
         # Setup a list of processes that we want to run
-        processes = [mp.Process(target=runstrategy, args=(x,fncodearr,div, dirs, freq)) for x in range(cores)]
+        processes = [mp.Process(target=runstrategy, args=(x,fncodearr,div, dirs, freq, q)) for x in range(cores)]
         
         # Run processes
         for p in processes:
             p.start()
-        
+
+        lp = threading.Thread(target=logger_thread, args=(q,))
+        lp.start()
+
         # Exit the completed processes
         for p in processes:
             p.join()
+
+        q.put(None)
+        lp.join()
 
     if mode == 'full' or mode == 'mock':
         strat   = None
