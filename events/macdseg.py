@@ -23,11 +23,6 @@ class MacdSeg(eventprofiler.Predicate):
 
     def __init__(self, feed, baseinfo, queue):
 
-        qh = logutils.queue.QueueHandler(queue)
-        root = logging.getLogger()
-        root.setLevel(logging.DEBUG)
-        root.addHandler(qh)
-
         self.__macd = {}
         self.__roc  = {}
         self.__gd   = None
