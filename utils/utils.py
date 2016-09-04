@@ -166,9 +166,9 @@ class DumpFeature(object):
         if not os.path.exists(dirs):
             os.makedirs(dirs)
         f = open(dirs + '/' + self.__inst[0][1] + '.cxshort.csv', 'w')
-        f.write('Date,cdif,cdea,Bear,cxShort,wsma5,yby,gfbl,gfscore,' + \
-                'xingtai,vret,vscore,nvpos,pret,pscore,nppos,slope,'  + \
-                'dma250,pma250,prext,tkdk,tkdf,ma20GD\n')
+        f.write('1Date,2cdif,3cdea,4Bear,5cxShort,6wsma5,7yby,8gfbl,9gfscore,' + \
+                '10xingtai,11vret,12vscore,13nvpos,14pret,15pscore,16nppos,17slope,'  + \
+                '18dma250,19pma250,20prext,21tkdk,22tkdf,23ma20GD\n')
         for cx in self.__cxshort:
             k = cx[0]
             v = cx[1]
@@ -304,10 +304,12 @@ class FakeTrade(object):
         self.__stopwin = 1.05
         self.__stoplos = 0.97
 
-        self.__bearstopwin = 1.05
-        self.__bearstoplos = 0.92
+        self.__bearstopwin = 1.09
+        self.__bearstoplos = 0.95
 
-        self.__maxbuy  = 10 
+        self.__numzuhe = 20
+        self.__maxbuy  = 20
+
         self.__forcetp = forcetp 
 
         self.__cashbase  = 300000
@@ -316,7 +318,7 @@ class FakeTrade(object):
 
         self.__btdir  = './backtests'
 
-        # bear=1 牛市
+        # bear = 1 熊市
         self.__bear   = 0
         self.__bearma = 0
         self.__openHD = 1 
@@ -455,6 +457,7 @@ class FakeTrade(object):
                     if ddif > 0 and ddea > 0: 
                         self.__openHD = 1
 
+    # 换仓
     def switchout(self, nday, yday, nxday, forcetp):
         flag = 0
         zuhe = []
@@ -480,6 +483,7 @@ class FakeTrade(object):
                 if sp is not None:
                     print 'DEBUG:', nday, 'Switch', comment, z[1][0], nxday, sp, buy
             if sp is None:
+                print 'DEBUG:', nday, 'Keep_ZUHE', z[1][0], nxday, buy
                 zuhe.append(z)
             else:
                 print 'DEBUG:', nday, 'Switch', z[1][0], nxday, sp, buy
@@ -795,8 +799,8 @@ class FakeTrade(object):
 
         retslog = []
         tdetail = None 
-        numzuhe = 10
-        maxbuy  = 10
+        numzuhe = self.__numzuhe 
+        maxbuy  = self.__maxbuy 
 
         forcetp  = self.__forcetp 
         
@@ -809,7 +813,12 @@ class FakeTrade(object):
             if len(self.__zuhe) < numzuhe:
                 maxbuy = self.__maxbuy 
 
+            # Update Bear or Bull
             self.updateBB(nday)
+
+            # Update Trade
+            szbuy = self.sztime(nday, 5)
+            self.__trade.upSZmtime(szbuy, self.__bear)
 
             # Track
             tdetail = self.trackZH(nday, retslog)
