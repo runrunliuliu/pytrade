@@ -1,5 +1,6 @@
 import sys
 import getopt
+import threading
 from pyalgotrade import eventprofiler
 from pyalgotrade.technical import stats
 from pyalgotrade.technical import roc
@@ -23,6 +24,14 @@ from utils import utils
 from pyalgotrade.utils import instinfo 
 from mock.triangle import triangle 
 from pyalgotrade import bar
+from conf import log
+import multiprocessing as mp
+from multiprocessing import Process, Queue
+import logging
+import logging.config
+import logging.handlers
+import logutils
+from logutils.queue import QueueHandler, QueueListener
 
 
 def parseinst(codearr, bk='ALL'):
@@ -40,6 +49,15 @@ def parseinst(codearr, bk='ALL'):
             out.append((fname,code))
 
     return out
+
+
+def logger_thread(q):
+    while True:
+        record = q.get()
+        if record is None:
+            break
+        logger = logging.getLogger(record.name)
+        logger.handle(record)
 
 
 def main(plot, argv):
@@ -88,29 +106,33 @@ def main(plot, argv):
     # instfiles = [("SZ300294.csv","SZ300294")]
     # instfiles = [("SH603003.csv","SH603003")]
     # instfiles = [("SH600326.csv","SH600326")]
-    # instfiles = [("SZ000540.csv","SZ000540")]
+    # instfiles = [("SZ002208.csv","SZ002208")]
     # instfiles = [("SZ300346.csv","SZ300346")]
     # instfiles = [("SZ300358.csv","SZ300358")]
-    # instfiles = [("SZ000961.csv","SZ000961")]
-    # instfiles = [("SH600069.csv","SH600069")]
-    # instfiles = [("SH600737.csv","SH600737")]
-    # instfiles = [("SH603799.csv","SH603799")]
-    instfiles = [("SH600784.csv","SH600784")]
-    # instfiles = [("SH600666.csv","SH600666")]
-    # instfiles = [("SH600502.csv","SH600502")]
-    # instfiles = [("SH600486.csv","SH600486")]
+    # instfiles = [("SZ002248.csv","SZ002248")]
+    # instfiles = [("SH600436.csv","SH600436")]
+    # instfiles = [("SH601801.csv","SH601801")]
+    # instfiles = [("SH603519.csv","SH603519")]
+    # instfiles = [("SH600900.csv","SH600900")]
+    # instfiles = [("SH600079.csv","SH600079")]
+    # instfiles = [("SH600383.csv","SH600383")]
+    # instfiles = [("SH600149.csv","SH600149")]
     # instfiles = [("SH601668.csv","SH601668")]
-    # instfiles = [("SH603799.csv","SH603799")]
-    # instfiles = [("SZ000002.csv","SZ000002")]
-    # instfiles = [("SZ002761.csv","SZ002761")]
-    # instfiles = [("SZ000961.csv","SZ000961")]
+    # instfiles = [("SH603609.csv","SH603609")]
+    # instfiles = [("SZ300121.csv","SZ300121")]
+    instfiles = [("SZ000533.csv","SZ000533")]
+    # instfiles = [("SZ300249.csv","SZ300249")]
+    # instfiles = [("SZ002043.csv","SZ002043")]
     # instfiles = [("SZ000413.csv","SZ000413")]
-    # instfiles = [("SZ300122.csv","SZ300122")]
-    # instfiles = [("SH600993.csv","SH600993")]
-    # instfiles = [("SH600848.csv","SH600848")]
+    # instfiles = [("SH603869.csv","SH603869")]
+    # instfiles = [("SH603618.csv","SH603618")]
     # instfiles = [("ZS000001.csv","ZS000001")]
     # instfiles = [("ZS399006.csv","ZS399006")]
     insts  = [] 
+
+    # LOG CONFIGURE
+    q = Queue()
+    logging.config.dictConfig(log.d)
 
     path = None
     for ele in instfiles:
@@ -124,18 +146,19 @@ def main(plot, argv):
         feed.addBarsFromCSV(inst, path,market=market)
         insts.append(inst)
 
-    predicate = macdseg.MacdSeg(feed, baseinfo)
+    lp = threading.Thread(target=logger_thread, args=(q,))
+    lp.daemon = True
+    lp.start()
+
+    predicate = macdseg.MacdSeg(feed, baseinfo, q)
 
     eventProfiler = eventprofiler.Profiler(predicate, 1, 1)
     eventProfiler.run(feed, 2, True)
 
-    # baseday  = '2016-04-21'
-    # startday = '2016-01-27'
-    # ft = utils.FakeTrade(codearr, dirpath, startday, baseday)
-    # ft.tradeInfo()
     dump = utils.DumpFeature(predicate, instfiles, dirpath) 
     dump.ToDump()
-
+   
+    q.put(None)
 
 if __name__ == "__main__":
     main(True, sys.argv[1:])
