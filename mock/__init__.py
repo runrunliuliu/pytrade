@@ -1,3 +1,4 @@
+# coding:utf-8
 import abc
 import os
 import datetime
@@ -14,6 +15,8 @@ class mockbase(object):
         self.__edate = datetime.datetime.strptime(baseday, "%Y-%m-%d")
         self.__tradesignal = OrderedDict()
         self.__mtime = OrderedDict()
+
+        self.__bear = None
 
     def loadMtime(self, dirs, code):
         fname = dirs + '/mtime/' + code + '.cxshort.csv'
@@ -74,6 +77,16 @@ class mockbase(object):
     @abc.abstractmethod
     def sell(self, tup, tday, nxday, instlast, baseday=None):
         raise NotImplementedError()
+
+    def getSZmtime(self):
+        return self.__bear
+
+    def upSZmtime(self, szbuy, bear):
+        # 上证择时
+        self.__szBuy = szbuy 
+        
+        # bear = 0 牛市
+        self.__bear = bear
 
     def getsDay(self):
         return self.__sdate
