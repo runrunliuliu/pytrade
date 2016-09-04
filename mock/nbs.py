@@ -32,6 +32,7 @@ class NBS(mockbase):
             if len(fsize) > 2:
                 continue
             code  = fname[0:8]
+            self.loadMtime(dirs, code)
             self.loadTrades(dirs, subdir, code)
 
     def setStop(self, win, loss):
@@ -119,30 +120,47 @@ class NBS(mockbase):
 
     def sell(self, tup, tday, nxday, instlast, baseday=None):
         sellprice = None
-        bp = tup[2]
+
+        sigday = tup[0]
 
         tup  = tup[1]
         inst = tup[0]
+
         if nxday is None:
             return sellprice
+
+        mkey = inst + '|' + tday
         skey = inst + '|' + nxday
         if skey not in self.__hiset:
             skey = inst + '|' + self.__lastdayk[inst]
+
+        # low  = float(self.__lwset[skey])
         high = float(self.__hiset[skey])
-
         ops  = float(self.__opset[skey])
-        low  = float(self.__lwset[skey])
+        cls  = float(self.__clset[skey])
 
-        # 止盈止损
-        pred = bp 
-        if high > pred * self.__stopwin:
-            sellprice = pred * self.__stopwin
-            if sellprice < ops:
-                sellprice = ops
-        if low  < pred * self.__stoplos:
-            sellprice = pred * self.__stoplos
-            if sellprice > ops:
-                sellprice = ops
+        tprice = None
+        trades = self.getTrades()[sigday]
+        for t in trades:
+            if t[0] == inst:
+                tprice = float(t[3])
+                break
+
+        if self.getSZmtime() == 1:
+            # 熊市止盈2
+            pred = tprice 
+            if high > pred * self.__stopwin:
+                sellprice = pred * self.__stopwin
+                if sellprice < ops:
+                    sellprice = ops
+        # 止盈1
+        if sellprice is None:
+            gd20price = self.getMtime()[mkey][21]
+            if cls < gd20price:
+                sellprice = cls
+
+        if cls < tprice * self.__stoplos:
+            sellprice = cls
 
         return sellprice
-# 
+#
