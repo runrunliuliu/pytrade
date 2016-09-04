@@ -33,6 +33,8 @@ from mock.select import select
 import logging
 import logging.config
 import logging.handlers
+import logutils
+from logutils.queue import QueueHandler, QueueListener
 
 
 def logger_thread(q):
@@ -148,6 +150,7 @@ def main(argv):
             p.start()
 
         lp = threading.Thread(target=logger_thread, args=(q,))
+        lp.daemon = True
         lp.start()
 
         # Exit the completed processes
@@ -155,7 +158,6 @@ def main(argv):
             p.join()
 
         q.put(None)
-        lp.join()
 
     if mode == 'full' or mode == 'mock':
         strat   = None
