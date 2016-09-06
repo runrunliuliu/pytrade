@@ -168,7 +168,7 @@ class DumpFeature(object):
         f = open(dirs + '/' + self.__inst[0][1] + '.cxshort.csv', 'w')
         f.write('1Date,2cdif,3cdea,4Bear,5cxShort,6wsma5,7yby,8gfbl,9gfscore,' + \
                 '10xingtai,11vret,12vscore,13nvpos,14pret,15pscore,16nppos,17slope,'  + \
-                '18dma250,19pma250,20prext,21tkdk,22tkdf,23ma20GD\n')
+                '18dma250,19pma250,20prext,21tkdk,22tkdf,23ma20GD,24lfbl,25lfblhi,26lfblcl\n')
         for cx in self.__cxshort:
             k = cx[0]
             v = cx[1]
