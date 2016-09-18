@@ -107,6 +107,8 @@ class NBS(mockbase):
         tzuhe.float_format = '.4'
         tzuhe.align = 'l'
         trades = self.getTrades()[nday]
+
+        stocks = []
         for t in trades:
             if float(t[2]) > 2000 and float(t[2]) < 3000:
                 print 'DEBUG', 'Drop Buy MAGIC SCORE', nday, t[0], t[1], float(t[2])
@@ -117,9 +119,20 @@ class NBS(mockbase):
             if tmax < tmin:
                 print 'DEBUG:','Drop Buy', t[0], t[1], tmin, tmax, nday
                 continue
+            stocks.append((t[0], tmin, tmax))
             price = '[' + str(tmin) + ' ' + str(tmax) + ']'
             tzuhe.add_row([nday, t[0], t[1], t[2], '--', '--', price, '--', '--', '--'])
         print tzuhe
+
+        self.dumpSelect(stocks, nday)
+
+    def dumpSelect(self, tups, nday):
+        f = open('./output/nbs/' + nday + '.sl.txt', 'w')
+        for t in tups:
+            line = t[0][-6:] + ',NBS,NBS,' + nday + ',' + t[1] + ',' + t[2]
+            f.write(line)
+            f.write('\n')
+        f.close()
 
     def buy(self, tup, nxday, nday, tp):
         buyprice = None; ret = True
