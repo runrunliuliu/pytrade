@@ -4,6 +4,8 @@ import sys
 import os
 from collections import OrderedDict
 from operator import itemgetter
+from signals import exitsigs 
+from prettytable import PrettyTable
 
 
 class NBS(mockbase):
@@ -35,6 +37,9 @@ class NBS(mockbase):
             self.loadMtime(dirs, code)
             self.loadTrades(dirs, subdir, code)
 
+    def initExit(self, mtime, instdaymap, lastdayk):
+        self.__exit = exitsigs.ExitSignals(mtime, instdaymap, lastdayk)
+
     def setStop(self, win, loss):
         self.__stopwin = win
         self.__stoplos = loss
@@ -50,13 +55,71 @@ class NBS(mockbase):
         self.__lastdayk = lastdayk
 
     def initZUHE(self, dirs, subdir, forcetp):
-        zuhe     = {}
-        ozuhe    = []
-        for line in open('./data/zuhe.txt'):
+        zuhe  = {}
+        ozuhe = []
+        for line in open('./data/zuhe.nbs.txt'):
             arr = line.strip().split(' ')
             zuhe[arr[2]] = arr[0]
             ozuhe.append(arr[2])
         return (zuhe, ozuhe)
+
+    # 选股
+    def select(self, tup, nday):
+        zuhe  = tup[0]
+        ozuhe = tup[1]
+        winn  = tup[2]
+        loss  = tup[3]
+        tzuhe = PrettyTable(['T日', '代码', '名称', '止盈价', '止损价', '收盘价'])
+        tzuhe.float_format = '.4'
+        tzuhe.align = 'l'
+        for k in ozuhe:
+            tprice = None
+            sigday = zuhe[k]
+            trades = self.getTrades()[sigday]
+            name   = ''
+            for t in trades:
+                if t[0] == k:
+                    tprice = float(t[3])
+                    name   = t[1]
+                    break
+            sp      = '--' 
+            stopwin = 1024
+            # 熊市
+            if self.getSZmtime() == 1:
+                # 买入第三日不收在突破日收盘之上，卖出
+                holds = self.__exit.HoldTime(k, sigday, nday)
+                if holds == 3:
+                    sigkey = k + '|' + sigday
+                    sp     = self.__clset[sigkey]
+                stopwin = tprice * winn
+
+            mkey = k + '|' + nday
+            md5120    = self.getMtime()[mkey][26]
+            gd20price = self.getMtime()[mkey][21]
+            sp = min([md5120, gd20price, sp])
+
+            stoplos = tprice * loss
+            tzuhe.add_row([nday, k, name, stopwin, stoplos, sp])
+        print tzuhe
+
+        # 选股
+        tzuhe = PrettyTable(['T日', '代码', '名称', '得分', '收益率', '持有天数', '开仓价', '止盈价', '止损价', '手数'])
+        tzuhe.float_format = '.4'
+        tzuhe.align = 'l'
+        trades = self.getTrades()[nday]
+        for t in trades:
+            if float(t[2]) > 2000 and float(t[2]) < 3000:
+                print 'DEBUG', 'Drop Buy MAGIC SCORE', nday, t[0], t[1], float(t[2])
+                continue
+            nclose = float(self.__clset[t[0] + '|' + nday])
+            tmin = "{:.4f}".format(nclose * 0.98) 
+            tmax = "{:.4f}".format(nclose * 1.03)
+            if tmax < tmin:
+                print 'DEBUG:','Drop Buy', t[0], t[1], tmin, tmax, nday
+                continue
+            price = '[' + str(tmin) + ' ' + str(tmax) + ']'
+            tzuhe.add_row([nday, t[0], t[1], t[2], '--', '--', price, '--', '--', '--'])
+        print tzuhe
 
     def buy(self, tup, nxday, nday, tp):
         buyprice = None; ret = True
@@ -64,6 +127,12 @@ class NBS(mockbase):
         inst   = tup[0]
         name   = tup[1]
         
+        trades = self.getTrades()[nday]
+        for t in trades:
+            if t[0] == inst and float(t[2]) > 2000 and float(t[2]) < 3000:
+                print 'DEBUG', 'Drop Buy MAGIC SCORE', nday, inst, float(t[2])
+                return buyprice
+
         dkey = inst + '|' + nxday
         if dkey not in self.__opset:
             ret = False
@@ -75,7 +144,7 @@ class NBS(mockbase):
 
         # 过滤高空3个点或者低开1个点的价格
         jump = (nxopen - nclose) / nclose 
-        if jump < -0.01 or jump > 0.03:
+        if jump < -0.02 or jump > 0.03:
             print 'DEBUG:', nday, 'DROP BarOpen', inst, name, nxday, nclose, nxopen, jump  
             ret = False
         if ret is True:
@@ -84,9 +153,6 @@ class NBS(mockbase):
             if tp == 0:
                 if bkey in self.__opset:
                     buyprice = float(self.__opset[bkey])
-
-        print 'TEST:', nday, inst, name, buyprice
-
         return buyprice 
   
     def pred(self, pkey):
@@ -146,13 +212,45 @@ class NBS(mockbase):
                 tprice = float(t[3])
                 break
 
+        # TF背离止损
+        # if sellprice is None:
+        #     tfbl = self.getMtime()[mkey][27]
+        #     if tfbl == 1:
+        #         print 'DEBUG:', 'TFBL', inst, tday, cls
+        #         sellprice = ops 
+        #         return sellprice
+
         if self.getSZmtime() == 1:
+            # 买入第三日不收在突破日收盘之上，卖出
+            holds = self.__exit.HoldTime(inst, sigday, tday)
+            if holds == 3:
+                sigkey = inst + '|' + sigday
+                if cls < float(self.__clset[sigkey]):
+                    print 'DEBUG:', 'HOLDS', sigkey, tday, holds
+                    sellprice = cls
+                    return sellprice
+
+            # 熊市背离出场 
+            exit = self.__exit.LFpeekBeiLi(inst, tday, high, cls)
+            if exit == 1:
+                print 'DEBUG:', 'LFBL', inst, tday, cls
+                sellprice = cls
+                return sellprice
+
             # 熊市止盈2
             pred = tprice 
             if high > pred * self.__stopwin:
                 sellprice = pred * self.__stopwin
                 if sellprice < ops:
                     sellprice = ops
+
+        # BIAS止盈 
+        if sellprice is None:
+            md5120 = self.getMtime()[mkey][26]
+            if md5120 != 1024 and cls < md5120:
+                print 'DEBUG:', 'MD5120', inst, tday, cls, md5120
+                sellprice = cls
+
         # 止盈1
         if sellprice is None:
             gd20price = self.getMtime()[mkey][21]
@@ -160,6 +258,7 @@ class NBS(mockbase):
                 sellprice = cls
 
         if cls < tprice * self.__stoplos:
+            print 'DEBUG:', 'STOP_LOSS', inst, nxday, tprice * self.__stoplos 
             sellprice = cls
 
         return sellprice
