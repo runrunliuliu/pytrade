@@ -71,6 +71,16 @@ class dbexport:
             f.write('\n')
         f.close()
 
+    def fetchDtrade(self):
+        cursor = self.conn.cursor()
+        f = open(self.path + '/dtrade.csv', 'w')
+        query = 'select group_concat(day, ",", stock_id, ",", name, "," , score) from tb_dtboard_info where day_type = 1 group by day,stock_id,score'
+        cursor.execute(query)
+        for row in cursor.fetchall():
+            f.write(row[0].encode('utf8'))
+            f.write('\n')
+        f.close()
+
     def fetchyidong(self):
         cursor = self.conn.cursor()
         query  = ''
