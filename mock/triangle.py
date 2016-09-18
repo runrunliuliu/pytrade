@@ -39,6 +39,9 @@ class triangle(mockbase):
             self.loadOB(dirs, subdir, code)
             self.loadTrades(dirs, subdir, code)
 
+    def initExit(self, mtime, instdaymap, lastdayk):
+        self.__exit = None 
+
     def setStop(self, win, loss):
         self.__stopwin = win
         self.__stoplos = loss
