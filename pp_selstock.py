@@ -181,6 +181,10 @@ def main(argv):
         if trade == 'QUSHI':
             subdir = 'qushi'
             strat = qushi(startday, baseday, codearr, dirs, forcetp)
+        if trade == 'nbs':
+            forcetp = 9 
+            subdir = 'nbs'
+            strat = NBS(startday, baseday, codearr, dirs, forcetp)
         ft = utils.FakeTrade(codearr, dirs, startday, baseday, strat, forcetp)
         ft.select(dirs, subdir, forcetp, trade)
 
