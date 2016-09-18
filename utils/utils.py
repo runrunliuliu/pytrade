@@ -168,7 +168,8 @@ class DumpFeature(object):
         f = open(dirs + '/' + self.__inst[0][1] + '.cxshort.csv', 'w')
         f.write('1Date,2cdif,3cdea,4Bear,5cxShort,6wsma5,7yby,8gfbl,9gfscore,' + \
                 '10xingtai,11vret,12vscore,13nvpos,14pret,15pscore,16nppos,17slope,'  + \
-                '18dma250,19pma250,20prext,21tkdk,22tkdf,23ma20GD,24lfbl,25lfblhi,26lfblcl\n')
+                '18dma250,19pma250,20prext,21tkdk,22tkdf,23ma20GD,24lfbl,25lfblhi,26lfblcl,27qsell,' + \
+                '28md5120,29tfbl\n')
         for cx in self.__cxshort:
             k = cx[0]
             v = cx[1]
@@ -304,11 +305,11 @@ class FakeTrade(object):
         self.__stopwin = 1.05
         self.__stoplos = 0.97
 
-        self.__bearstopwin = 1.09
-        self.__bearstoplos = 0.95
+        self.__bearstopwin = 1.11
+        self.__bearstoplos = 0.89
 
-        self.__numzuhe = 20
-        self.__maxbuy  = 20
+        self.__numzuhe = 10
+        self.__maxbuy  = 6
 
         self.__forcetp = forcetp 
 
@@ -365,6 +366,10 @@ class FakeTrade(object):
 
         self.__tradesignal = self.__trade.getTrades() 
         self.__mtime  = self.__trade.getMtime()
+
+        self.__trade.initExit(self.__mtime, \
+                              self.__instdaymap, \
+                              self.__lastdayk)
 
     def checkDayRange(self, day):
         ret = True 
@@ -779,16 +784,32 @@ class FakeTrade(object):
         (zuhe, ozuhe) = self.__trade.initZUHE(dirs, subdir, forcetp)
         nday = self.__baseday
         tups  = self.__tradesignal[nday] 
-
         # FINAL OUTPUT
         (buys, holds, sells) = self.qushiClassiz(tups)
         self.qushiDump(buys, holds, sells)
+
+    # NBS select
+    def nbSelect(self, dirs, subdir, forcetp):
+        (zuhe, ozuhe) = self.__trade.initZUHE(dirs, subdir, forcetp)
+        nday = self.__baseday
+
+        # 更新择时
+        self.updateBB(nday)
+        szbuy = self.sztime(nday, 5)
+        self.__trade.upSZmtime(szbuy, self.__bear)
+
+        (winn, loss) = self.updateStopWinLoss(forcetp)
+
+        tup = (zuhe, ozuhe, winn, loss)
+        self.__trade.select(tup, nday)
 
     def select(self, dirs, subdir, forcetp, trade):
         if trade == 'triangle':
             self.triangleSelect(dirs, subdir, forcetp)
         if trade == 'QUSHI':
             self.qushiSelect(dirs, subdir, forcetp)
+        if trade == 'nbs':
+            self.nbSelect(dirs, subdir, forcetp)
 
     # ------------------ MAIN MODULE ---------------------------------- ##############
     def mock(self):
