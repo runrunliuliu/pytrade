@@ -78,6 +78,10 @@ class mockbase(object):
     def sell(self, tup, tday, nxday, instlast, baseday=None):
         raise NotImplementedError()
 
+    @abc.abstractmethod
+    def dumpSelect(self, tups):
+        raise NotImplementedError()
+
     def getSZmtime(self):
         return self.__bear
 
