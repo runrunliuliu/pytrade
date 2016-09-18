@@ -82,6 +82,10 @@ def main(argv):
         db = dbexport()
         db.fetchdtboard()
 
+    if action == 'fetchdtrade':
+        db = dbexport()
+        db.fetchDtrade()
+
     if action == 'fetchinfo':
         db = dbexport()
         db.fetchStockInfo()
