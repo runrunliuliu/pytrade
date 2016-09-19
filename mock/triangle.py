@@ -2,6 +2,7 @@
 from mock import mockbase
 import sys
 import os
+import os.path
 from collections import OrderedDict
 from operator import itemgetter
 
@@ -63,19 +64,21 @@ class triangle(mockbase):
         qsline = {}
         zuhe  = {}
         ozuhe = []
-        for line in open('./data/zuhe.txt'):
-            arr = line.strip().split(' ')
-            zuhe[arr[2]] = arr[0]
-            ozuhe.append(arr[2])
-            code  = arr[2]
-            fname = dirs + '/' + subdir + '/' + code + '.trade.csv'
-            if os.path.isfile(fname) is False:
-                return
-            for line in open(fname):
-                tmp  = line.strip().split(',')
-                day  = tmp[0]
-                if day == zuhe[code]:
-                    qsline[code] = (tmp[2],tmp[6])
+        zfname = './data/zuhe.txt'
+        if os.path.isfile(zfname): 
+            for line in open(zfname):
+                arr = line.strip().split(' ')
+                zuhe[arr[2]] = arr[0]
+                ozuhe.append(arr[2])
+                code  = arr[2]
+                fname = dirs + '/' + subdir + '/' + code + '.trade.csv'
+                if os.path.isfile(fname) is False:
+                    return
+                for line in open(fname):
+                    tmp  = line.strip().split(',')
+                    day  = tmp[0]
+                    if day == zuhe[code]:
+                        qsline[code] = (tmp[2],tmp[6])
         return (qsline, zuhe, ozuhe)
 
     def pred(self, pkey):
