@@ -60,7 +60,7 @@ class NBS(mockbase):
         ozuhe = []
         fname = './data/zuhe.nbs.txt'
         if os.path.isfile(fname): 
-            for line in open():
+            for line in open(fname):
                 arr = line.strip().split(' ')
                 zuhe[arr[2]] = arr[0]
                 ozuhe.append(arr[2])
