@@ -42,6 +42,9 @@ class triangle(mockbase):
     def initExit(self, mtime, instdaymap, lastdayk):
         self.__exit = None 
 
+    def dumpSelect(self, tups, nday):
+        self.__select = None
+
     def setStop(self, win, loss):
         self.__stopwin = win
         self.__stoplos = loss
