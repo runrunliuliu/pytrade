@@ -3,6 +3,11 @@ source ~/.bashrc
 py=`which python`
 echo $py
 
+mkdir -p data
+mkdir -p output
+mkdir -p logs
+mkdir -p output/nbs/
+
 # download data
 bash download.sh
 
