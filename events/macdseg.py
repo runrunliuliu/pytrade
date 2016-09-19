@@ -190,7 +190,7 @@ class MacdSeg(eventprofiler.Predicate):
         score  = NBS[1]
         tprice = NBS[2] 
         gprice = NBS[3] 
-        key    = NBS[0] 
+        key    = str(NBS[0]) + ',' + str(NBS[4])
         rets = (inst, instname, score, tprice, gprice, key)
         return rets
 
