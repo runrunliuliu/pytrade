@@ -35,6 +35,14 @@ class qushi(mockbase):
             code  = fname[0:8]
             self.loadTrades(dirs, subdir, code)
 
+    # interface to be DONE
+    def initExit(self, mtime, instdaymap, lastdayk):
+        self.__exit = None 
+
+    # interface to be DONE 
+    def dumpSelect(self, tups, nday):
+        self.__select = None
+
     def setStop(self, win, loss):
         self.__stopwin = win
         self.__stoplos = loss
@@ -56,17 +64,10 @@ class qushi(mockbase):
             arr = line.strip().split(' ')
             zuhe[arr[2]] = arr[0]
             ozuhe.append(arr[2])
-            code  = arr[2]
         return (zuhe, ozuhe)
 
     def buy(self, tup, nxday, nday, tp):
         buyprice = None
-
-        inst   = tup[0]
-        name   = tup[1]
-        dprice = tup[3]
-        gprice = tup[4]
-        
         return buyprice 
   
     def pred(self, pkey):
