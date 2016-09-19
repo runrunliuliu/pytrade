@@ -2,6 +2,7 @@
 from mock import mockbase
 import sys
 import os
+import os.path
 from collections import OrderedDict
 from operator import itemgetter
 from signals import exitsigs 
@@ -57,10 +58,12 @@ class NBS(mockbase):
     def initZUHE(self, dirs, subdir, forcetp):
         zuhe  = {}
         ozuhe = []
-        for line in open('./data/zuhe.nbs.txt'):
-            arr = line.strip().split(' ')
-            zuhe[arr[2]] = arr[0]
-            ozuhe.append(arr[2])
+        fname = './data/zuhe.nbs.txt'
+        if os.path.isfile(fname): 
+            for line in open():
+                arr = line.strip().split(' ')
+                zuhe[arr[2]] = arr[0]
+                ozuhe.append(arr[2])
         return (zuhe, ozuhe)
 
     # 选股
@@ -113,6 +116,10 @@ class NBS(mockbase):
             if float(t[2]) > 2000 and float(t[2]) < 3000:
                 print 'DEBUG', 'Drop Buy MAGIC SCORE', nday, t[0], t[1], float(t[2])
                 continue
+            if float(t[5]) < 200 and float(t[6]) < 0.8:
+                print 'DEBUG', 'Drop Buy DTBOARD', nday, t[0], t[1], t[5], t[6]
+                continue
+
             nclose = float(self.__clset[t[0] + '|' + nday])
             tmin = "{:.4f}".format(nclose * 0.98) 
             tmax = "{:.4f}".format(nclose * 1.03)
@@ -143,7 +150,10 @@ class NBS(mockbase):
         trades = self.getTrades()[nday]
         for t in trades:
             if t[0] == inst and float(t[2]) > 2000 and float(t[2]) < 3000:
-                print 'DEBUG', 'Drop Buy MAGIC SCORE', nday, inst, float(t[2])
+                print 'DEBUG', 'Drop Buy MAGIC SCORE', nday, inst, t[1], float(t[2])
+                return buyprice
+            if t[0] == inst and float(t[5]) < 200 and float(t[6]) < 0.8:
+                print 'DEBUG', 'Drop Buy DTBOARD', nday, inst, t[1], t[5], t[6]
                 return buyprice
 
         dkey = inst + '|' + nxday
