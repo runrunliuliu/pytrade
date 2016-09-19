@@ -2,6 +2,7 @@
 from mock import mockbase
 import sys
 import os
+import os.path
 from collections import OrderedDict
 from operator import itemgetter
 
@@ -60,10 +61,12 @@ class qushi(mockbase):
     def initZUHE(self, dirs, subdir, forcetp):
         zuhe     = {}
         ozuhe    = []
-        for line in open('./data/zuhe.txt'):
-            arr = line.strip().split(' ')
-            zuhe[arr[2]] = arr[0]
-            ozuhe.append(arr[2])
+        fname = './data/zuhe.qushi.txt'
+        if os.path.isfile(fname): 
+            for line in open(fname):
+                arr = line.strip().split(' ')
+                zuhe[arr[2]] = arr[0]
+                ozuhe.append(arr[2])
         return (zuhe, ozuhe)
 
     def buy(self, tup, nxday, nday, tp):
