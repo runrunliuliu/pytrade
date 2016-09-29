@@ -161,6 +161,9 @@ class DumpFeature(object):
         # NBS策略 
         self.TradeSignal2csv('nbs', 3, 'trade')
 
+        # K-LINE策略 
+        self.TradeSignal2csv('kline', 4, 'trade')
+
     def CX2csv(self, subdir):
         dirs = self.__dir + '/' + subdir 
         if not os.path.exists(dirs):
@@ -308,8 +311,8 @@ class FakeTrade(object):
         self.__bearstopwin = 1.11
         self.__bearstoplos = 0.89
 
-        self.__numzuhe = 10
-        self.__maxbuy  = 6
+        self.__numzuhe = 6
+        self.__maxbuy  = 3
 
         self.__forcetp = forcetp 
 
@@ -528,7 +531,7 @@ class FakeTrade(object):
             buy    = float(s[1])
             sel    = float(s[2])
             shares = int(s[5])
-            self.__cashtotal = (sel - buy) * shares + self.__cashtotal - 0.0006 * sel * shares
+            self.__cashtotal = (sel - buy) * shares + self.__cashtotal - 0.0013 * sel * shares
 
         fuying = 0
         if len(self.__zuhe) == 0:
@@ -768,7 +771,7 @@ class FakeTrade(object):
 
     def qushiDump(self, buys, holds, sells):
         nday = self.__baseday
-        f = open('./output/' + nday + '.qushi.csv', 'w')
+        f = open('./output/qushi/' + nday + '.qushi.csv', 'w')
         def dump(f, arr, act):
             for i in arr:
                 tmp = i[1]
@@ -855,6 +858,7 @@ class FakeTrade(object):
             if nday not in self.__tradesignal:
                 continue
             tups = self.__tradesignal[nday] 
+            tups = self.__trade.resortTrades(tups)
             nbuy = 0
             for t in tups:
                 if len(self.__zuhe) == numzuhe:
@@ -904,7 +908,7 @@ class FakeTrade(object):
     def distshares(self, bp, maxzuhe, nday):
         shares = self.calShares(bp, maxzuhe, nday) 
         self.__cashused  = bp * shares + self.__cashused
-        self.__cashtotal = self.__cashtotal - 0.0006 * bp * shares 
+        self.__cashtotal = self.__cashtotal - 0.0003 * bp * shares 
 
         return shares
 
