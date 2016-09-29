@@ -8,6 +8,12 @@ class ExitSignals(object):
         self.__insbdaymap  = insbdaymap 
         self.__lasbdayk    = lasbdayk
 
+    def setOHLC(self, op, hi, lw, cl):
+        self.__op = op
+        self.__hi = hi
+        self.__lw = lw
+        self.__cl = cl
+
     # 临峰背离
     def LFpeekBeiLi(self, code, nday, nxhi, nxcl):
         ret = 0
@@ -55,4 +61,23 @@ class ExitSignals(object):
             end = daymap[nday] 
         holds = end - start + 1
         return holds
+
+    def tkdk(self, code, nday, nxday):
+        ret = 0
+        nkey = code + '|' + nday
+        skey = code + '|' + nxday
+
+        nop = float(self.__op[nkey])
+        ncl = float(self.__cl[nkey])
+        
+        sop = float(self.__op[skey])
+
+        print nday, nxday, code, nop, ncl, sop
+
+        if (ncl - nop) / nop < -0.04 and (sop - ncl) / ncl < -0.025:
+            ret = 1
+        if ncl < nop and (sop - ncl) / ncl < -0.04:
+            ret = 1
+        return ret
+
 #
