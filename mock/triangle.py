@@ -43,6 +43,9 @@ class triangle(mockbase):
     def initExit(self, mtime, instdaymap, lastdayk):
         self.__exit = None 
 
+    def resortTrades(self, tups):
+        return tups
+
     def dumpSelect(self, tups, nday):
         self.__select = None
 
