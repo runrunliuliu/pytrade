@@ -63,6 +63,10 @@ class mockbase(object):
         return self.__tradesignal
 
     @abc.abstractmethod
+    def resortTrades(self, tups):
+        raise NotImplementedError()
+
+    @abc.abstractmethod
     def filter(self, pkey):
         raise NotImplementedError()
 
