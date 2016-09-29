@@ -44,6 +44,9 @@ class KLINE(mockbase):
     def initExit(self, mtime, instdaymap, lastdayk):
         self.__exit = exitsigs.ExitSignals(mtime, instdaymap, lastdayk)
 
+        self.__exit.setOHLC(self.__opset, self.__hiset, \
+                            self.__lwset, self.__clset)
+
     def setStop(self, win, loss):
         self.__stopwin = win
         self.__stoplos = loss
@@ -224,6 +227,13 @@ class KLINE(mockbase):
             skey = inst + '|' + self.__lastdayk[inst]
 
         cls  = float(self.__clset[skey])
+        
+        # ops  = float(self.__opset[skey])
+        # tkdk = self.__exit.tkdk(inst, tday, nxday)
+        # if tkdk == 1:
+        #     print 'DEBUG', 'TKDK SELL on OPEN ', tday, nxday, inst 
+        #     sellprice = ops 
+        #     return sellprice
 
         # 买入第二日卖出
         holds = self.__exit.HoldTime(inst, sigday, tday)
