@@ -36,6 +36,9 @@ class qushi(mockbase):
             code  = fname[0:8]
             self.loadTrades(dirs, subdir, code)
 
+    def resortTrades(self, tups):
+        return tups
+
     # interface to be DONE
     def initExit(self, mtime, instdaymap, lastdayk):
         self.__exit = None 
