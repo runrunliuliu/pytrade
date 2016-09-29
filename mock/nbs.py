@@ -38,6 +38,9 @@ class NBS(mockbase):
             self.loadMtime(dirs, code)
             self.loadTrades(dirs, subdir, code)
 
+    def resortTrades(self, tups):
+        return tups
+
     def initExit(self, mtime, instdaymap, lastdayk):
         self.__exit = exitsigs.ExitSignals(mtime, instdaymap, lastdayk)
 
