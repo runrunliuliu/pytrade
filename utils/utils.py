@@ -172,7 +172,7 @@ class DumpFeature(object):
         f.write('1Date,2cdif,3cdea,4Bear,5cxShort,6wsma5,7yby,8gfbl,9gfscore,' + \
                 '10xingtai,11vret,12vscore,13nvpos,14pret,15pscore,16nppos,17slope,'  + \
                 '18dma250,19pma250,20prext,21tkdk,22tkdf,23ma20GD,24lfbl,25lfblhi,26lfblcl,27qsell,' + \
-                '28md5120,29tfbl\n')
+                '28md5120,29tfbl,30fibs,31bias5120,32fbprice,33fbpress\n')
         for cx in self.__cxshort:
             k = cx[0]
             v = cx[1]
@@ -531,7 +531,7 @@ class FakeTrade(object):
             buy    = float(s[1])
             sel    = float(s[2])
             shares = int(s[5])
-            self.__cashtotal = (sel - buy) * shares + self.__cashtotal - 0.0013 * sel * shares
+            self.__cashtotal = (sel - buy) * shares + self.__cashtotal - 0.0015 * sel * shares
 
         fuying = 0
         if len(self.__zuhe) == 0:
@@ -908,7 +908,7 @@ class FakeTrade(object):
     def distshares(self, bp, maxzuhe, nday):
         shares = self.calShares(bp, maxzuhe, nday) 
         self.__cashused  = bp * shares + self.__cashused
-        self.__cashtotal = self.__cashtotal - 0.0003 * bp * shares 
+        self.__cashtotal = self.__cashtotal - 0.0005 * bp * shares 
 
         return shares
 
