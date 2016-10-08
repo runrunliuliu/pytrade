@@ -6,8 +6,53 @@ echo $py
 day0=`date +"%Y-%m-%d"`
 echo $day0
 
-trade='nbs'
+trade='kline'
 
+sday='2006-01-04'
+eday='2006-12-29'
+nohup $py pp_selstock.py -m 'mock' -s $sday -d $eday -t $trade 1>logs/$sday'_'$eday'.log' 2>&1 &
+
+sday='2007-01-04'
+eday='2007-12-28'
+nohup $py pp_selstock.py -m 'mock' -s $sday -d $eday -t $trade 1>logs/$sday'_'$eday'.log' 2>&1 &
+
+sday='2008-01-04'
+eday='2008-12-31'
+nohup $py pp_selstock.py -m 'mock' -s $sday -d $eday -t $trade 1>logs/$sday'_'$eday'.log' 2>&1 &
+
+sday='2009-01-05'
+eday='2009-12-31'
+nohup $py pp_selstock.py -m 'mock' -s $sday -d $eday -t $trade 1>logs/$sday'_'$eday'.log' 2>&1 &
+
+sday='2010-01-04'
+eday='2010-12-31'
+nohup $py pp_selstock.py -m 'mock' -s $sday -d $eday -t $trade 1>logs/$sday'_'$eday'.log' 2>&1 &
+
+sday='2011-01-04'
+eday='2011-12-30'
+nohup $py pp_selstock.py -m 'mock' -s $sday -d $eday -t $trade 1>logs/$sday'_'$eday'.log' 2>&1 &
+
+sday='2012-01-04'
+eday='2012-12-31'
+nohup $py pp_selstock.py -m 'mock' -s $sday -d $eday -t $trade 1>logs/$sday'_'$eday'.log' 2>&1 &
+
+sday='2013-01-04'
+eday='2013-12-31'
+nohup $py pp_selstock.py -m 'mock' -s $sday -d $eday -t $trade 1>logs/$sday'_'$eday'.log' 2>&1 &
+
+sday='2014-01-02'
+eday='2014-12-31'
+nohup $py pp_selstock.py -m 'mock' -s $sday -d $eday -t $trade 1>logs/$sday'_'$eday'.log' 2>&1 &
+
+sday='2015-01-05'
+eday='2015-12-31'
+nohup $py pp_selstock.py -m 'mock' -s $sday -d $eday -t $trade 1>logs/$sday'_'$eday'.log' 2>&1 &
+
+sday='2016-01-04'
+eday='2016-09-30'
+nohup $py pp_selstock.py -m 'mock' -s $sday -d $eday -t $trade 1>logs/$sday'_'$eday'.log' 2>&1 &
+
+exit
 sday='2006-05-12'
 eday='2007-05-11'
 nohup $py pp_selstock.py -m 'mock' -s $sday -d $eday -t $trade 1>logs/$sday'_'$eday'.log' 2>&1 &
