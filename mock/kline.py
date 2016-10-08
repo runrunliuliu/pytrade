@@ -150,13 +150,42 @@ class KLINE(mockbase):
     def buy(self, tup, nxday, nday, tp):
         buyprice = None; ret = True
 
-        inst   = tup[0]
-        name   = tup[1]
+        inst  = tup[0]
+        name  = tup[1]
+        jhold = -0.50
         
+        mkey = inst + '|' + nday
+        fibs = float(self.getMtime()[mkey][28])
+        if fibs == 1:
+            print 'DEBUG', 'Drop Buy Fibs StopLine', nday, inst, fibs 
+            return buyprice
+
+        bias5120 = float(self.getMtime()[mkey][29])
+        if bias5120 != 1024 and bias5120 > 0.70:
+            print 'DEBUG', 'Drop Buy High Bias5120', nday, inst, bias5120 
+            return buyprice
+
         trades = self.getTrades()[nday]
         for t in trades:
             if t[0] == inst:
-                if (float(t[5]) == 2 or float(t[5]) == 4) and float(t[2]) < -300:
+                if float(t[2]) > 5000:
+                    print 'DEBUG', 'Drop Buy BIGGER SCORE', nday, inst, name, t[2], t[5]
+                    return buyprice
+
+                if float(t[5]) == 5 or float(t[5]) == 7:
+                    jhold = 0.00
+                    if float(t[2]) < 0:
+                        return buyprice
+
+                if float(t[5]) == 6:
+                    jhold = -0.04
+
+                if float(t[5]) == 8:
+                    jhold = -0.04
+                    if float(t[2]) < 0:
+                        return buyprice
+
+                if (float(t[5]) == 2 or float(t[5]) == 4) and float(t[2]) < -100:
                     print 'DEBUG', 'Drop Buy MAGIC SCORE', nday, inst, t[2], t[5]
                     return buyprice
 
@@ -171,7 +200,7 @@ class KLINE(mockbase):
 
         # 过滤高空3个点或者低开1个点的价格
         jump = (nxopen - nclose) / nclose 
-        if jump > 0.03:
+        if jump > 0.03 or jump < jhold:
             print 'DEBUG:', nday, 'DROP BarOpen', inst, name, nxday, nclose, nxopen, jump  
             ret = False
         if ret is True:
@@ -214,10 +243,10 @@ class KLINE(mockbase):
     def sell(self, tup, tday, nxday, instlast, baseday=None):
         sellprice = None
 
-        sigday = tup[0]
-
-        tup  = tup[1]
-        inst = tup[0]
+        sigday  = tup[0]
+        tup     = tup[1]
+        inst    = tup[0]
+        maxhold = 2
 
         if nxday is None:
             return sellprice
@@ -235,9 +264,17 @@ class KLINE(mockbase):
         #     sellprice = ops 
         #     return sellprice
 
+        trades = self.getTrades()[sigday]
+        for t in trades:
+            if t[0] == inst:
+                if float(t[5]) == 8:
+                    maxhold = 3
+                    break
+
         # 买入第二日卖出
         holds = self.__exit.HoldTime(inst, sigday, tday)
-        if holds == 2:
+
+        if holds == maxhold:
             sellprice = cls
 
         return sellprice
