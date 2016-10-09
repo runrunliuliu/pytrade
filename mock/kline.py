@@ -198,6 +198,12 @@ class KLINE(mockbase):
         nxopen = float(self.__opset[dkey])
         nclose = float(self.__clset[inst + '|' + nday])
 
+        # # 过滤低开在黄金分割位下
+        # fibprice = float(self.getMtime()[mkey][30])
+        # if fibprice != 1024 and (nxopen - fibprice) / fibprice < -0.005:
+        #     print 'DEBUG:', nday, 'DROP BarOpen Fibs', inst, name, nxday, fibprice, nxopen
+        #     ret = False
+
         # 过滤高空3个点或者低开1个点的价格
         jump = (nxopen - nclose) / nclose 
         if jump > 0.03 or jump < jhold:
@@ -240,7 +246,7 @@ class KLINE(mockbase):
                     sellprice = ref
         return sellprice
 
-    def sell(self, tup, tday, nxday, instlast, baseday=None):
+    def sell(self, tup, tday, nxday, instlast, yday, baseday=None):
         sellprice = None
 
         sigday  = tup[0]
@@ -256,18 +262,26 @@ class KLINE(mockbase):
             skey = inst + '|' + self.__lastdayk[inst]
 
         cls  = float(self.__clset[skey])
-        
-        # ops  = float(self.__opset[skey])
+        ops  = float(self.__opset[skey])
         # tkdk = self.__exit.tkdk(inst, tday, nxday)
         # if tkdk == 1:
         #     print 'DEBUG', 'TKDK SELL on OPEN ', tday, nxday, inst 
         #     sellprice = ops 
         #     return sellprice
 
+        mkey     = inst + '|' + sigday 
+        # 长阴破位离场
+        fibprice = float(self.getMtime()[mkey][30])
+        jypw     = self.__exit.JYPW(inst, yday, tday, nxday, fibprice)
+        if jypw == 1:
+            print 'DEBUG', 'JYPW SELL on OPEN', yday, tday, nxday, inst, fibprice 
+            sellprice = ops 
+            return sellprice
+
         trades = self.getTrades()[sigday]
         for t in trades:
             if t[0] == inst:
-                if float(t[5]) == 8:
+                if float(t[5]) == 8 or float(t[5]) == 6:
                     maxhold = 3
                     break
 
