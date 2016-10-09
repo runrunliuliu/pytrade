@@ -806,6 +806,16 @@ class FakeTrade(object):
         tup = (zuhe, ozuhe, winn, loss)
         self.__trade.select(tup, nday)
 
+    # Kline select
+    def klSelect(self, dirs, subdir, forcetp):
+        (zuhe, ozuhe) = self.__trade.initZUHE(dirs, subdir, forcetp)
+        nday = self.__baseday
+
+        (yday, nxday) = self.getDays('ZS000001', nday)
+        tup = (zuhe, ozuhe, yday)
+
+        self.__trade.select(tup, nday)
+
     def select(self, dirs, subdir, forcetp, trade):
         if trade == 'triangle':
             self.triangleSelect(dirs, subdir, forcetp)
@@ -813,6 +823,8 @@ class FakeTrade(object):
             self.qushiSelect(dirs, subdir, forcetp)
         if trade == 'nbs':
             self.nbSelect(dirs, subdir, forcetp)
+        if trade == 'kline':
+            self.klSelect(dirs, subdir, forcetp)
 
     # ------------------ MAIN MODULE ---------------------------------- ##############
     def mock(self):
