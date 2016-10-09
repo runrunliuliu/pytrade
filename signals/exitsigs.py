@@ -62,6 +62,7 @@ class ExitSignals(object):
         holds = end - start + 1
         return holds
 
+    # 跳空低开
     def tkdk(self, code, nday, nxday):
         ret = 0
         nkey = code + '|' + nday
@@ -80,4 +81,17 @@ class ExitSignals(object):
             ret = 1
         return ret
 
+    # 巨阴破位
+    def JYPW(self, code, nday, nxday, price):
+        ret = 0
+        nkey = code + '|' + nday
+        skey = code + '|' + nxday
+
+        ncl = float(self.__cl[nkey])
+        sop = float(self.__op[skey])
+        scl = float(self.__cl[skey])
+        
+        if sop > price and scl < price and (scl - ncl) / ncl < -0.08:
+            ret = 1
+        return ret
 #
