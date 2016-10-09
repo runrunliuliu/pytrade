@@ -168,6 +168,9 @@ class KLINE(mockbase):
         trades = self.getTrades()[nday]
         for t in trades:
             if t[0] == inst:
+                if float(t[5]) == 5:
+                    return buyprice
+
                 if float(t[2]) > 5000:
                     print 'DEBUG', 'Drop Buy BIGGER SCORE', nday, inst, name, t[2], t[5]
                     return buyprice
