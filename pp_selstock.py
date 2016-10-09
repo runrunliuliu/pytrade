@@ -189,6 +189,10 @@ def main(argv):
             forcetp = 9 
             subdir = 'nbs'
             strat = NBS(startday, baseday, codearr, dirs, forcetp)
+        if trade == 'kline':
+            forcetp = 11 
+            subdir = 'kline'
+            strat = KLINE(startday, baseday, codearr, dirs, forcetp)
         ft = utils.FakeTrade(codearr, dirs, startday, baseday, strat, forcetp)
         ft.select(dirs, subdir, forcetp, trade)
 
