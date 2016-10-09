@@ -3,6 +3,8 @@ source ~/.bashrc
 py=`which python`
 echo $py
 
+mkdir -p backtests 
+mkdir -p data
 mkdir -p data
 mkdir -p output
 mkdir -p logs
