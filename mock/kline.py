@@ -74,41 +74,38 @@ class KLINE(mockbase):
 
     # 选股
     def select(self, tup, nday):
+        maxhold = 2
+
         zuhe  = tup[0]
         ozuhe = tup[1]
-        winn  = tup[2]
-        loss  = tup[3]
-        tzuhe = PrettyTable(['T日', '代码', '名称', '止盈价', '止损价', '收盘价'])
+        yday  = tup[2]
+
+        tzuhe = PrettyTable(['T日', '代码', '名称', '止盈价', '止损价', 'Holds'])
         tzuhe.float_format = '.4'
         tzuhe.align = 'l'
         for k in ozuhe:
-            tprice = None
+            inst   = k
             sigday = zuhe[k]
             trades = self.getTrades()[sigday]
             name   = ''
             for t in trades:
                 if t[0] == k:
-                    tprice = float(t[3])
                     name   = t[1]
-                    break
-            sp      = '--' 
-            stopwin = 1024
-            # 熊市
-            if self.getSZmtime() == 1:
-                # 买入第三日不收在突破日收盘之上，卖出
-                holds = self.__exit.HoldTime(k, sigday, nday)
-                if holds == 3:
-                    sigkey = k + '|' + sigday
-                    sp     = self.__clset[sigkey]
-                stopwin = tprice * winn
-
-            mkey = k + '|' + nday
-            md5120    = self.getMtime()[mkey][26]
-            gd20price = self.getMtime()[mkey][21]
-            sp = min([md5120, gd20price, sp])
-
-            stoplos = tprice * loss
-            tzuhe.add_row([nday, k, name, stopwin, stoplos, sp])
+                    if float(t[5]) == 8 or float(t[5]) == 6:
+                        maxhold = 3
+                        break
+            # 长阴破位离场
+            mkey     = k + '|' + sigday
+            fibprice = float(self.getMtime()[mkey][30])
+            jypw     = self.__exit.JYPW(inst, yday, nday, None, fibprice)
+            if jypw == 1:
+                print 'DEBUG', 'JYPW SELL on OPEN', yday, nday, inst, name, fibprice 
+                continue
+            holds = self.__exit.HoldTime(k, sigday, nday)
+            if holds == maxhold:
+                print 'DEBUG', 'MXHD SELL on CLOSE', nday, inst, name 
+                continue
+            tzuhe.add_row([nday, k, name, '--', '--', holds])
         print tzuhe
 
         # 选股
@@ -116,25 +113,49 @@ class KLINE(mockbase):
         tzuhe.float_format = '.4'
         tzuhe.align = 'l'
         trades = self.getTrades()[nday]
-
         stocks = []
         for t in trades:
-            if float(t[2]) > 2000 and float(t[2]) < 3000:
-                print 'DEBUG', 'Drop Buy MAGIC SCORE', nday, t[0], t[1], float(t[2])
+            inst    = t[0]
+            name    = t[1]
+            jhold   = -0.50
+            maxhold = 2
+
+            if float(t[5]) == 8 or float(t[5]) == 6:
+                maxhold = 3
+
+            if float(t[5]) == 5:
+                print 'DEBUG', 'Drop Buy CROSS_STAR', nday, inst, name, t[5]
                 continue
-            if float(t[5]) < 200 and float(t[6]) < 0.8:
-                print 'DEBUG', 'Drop Buy DTBOARD', nday, t[0], t[1], t[5], t[6]
+
+            if float(t[2]) > 5000:
+                print 'DEBUG', 'Drop Buy BIGGER SCORE', nday, inst, name, t[2], t[5]
+                continue
+
+            if float(t[5]) == 5 or float(t[5]) == 7:
+                jhold = 0.00
+                if float(t[2]) < 0:
+                    print 'DEBUG', 'Drop Buy SCORE < 0', nday, inst, name, t[2], t[5]
+                    continue
+
+            if float(t[5]) == 6:
+                jhold = -0.04
+
+            if float(t[5]) == 8:
+                jhold = -0.04
+                if float(t[2]) < 0:
+                    print 'DEBUG', 'Drop Buy SCORE < 0', nday, inst, name, t[2], t[5]
+                    continue
+
+            if (float(t[5]) == 2 or float(t[5]) == 4) and float(t[2]) < -100:
+                print 'DEBUG', 'Drop Buy MAGIC SCORE', nday, inst, t[2], t[5]
                 continue
 
             nclose = float(self.__clset[t[0] + '|' + nday])
-            tmin = "{:.4f}".format(nclose * 0.98) 
+            tmin = "{:.4f}".format(nclose * (1 + jhold)) 
             tmax = "{:.4f}".format(nclose * 1.03)
-            if tmax < tmin:
-                print 'DEBUG:','Drop Buy', t[0], t[1], tmin, tmax, nday
-                continue
-            stocks.append((t[0], tmin, tmax))
+            stocks.append((t[0], tmin, tmax, maxhold))
             price = '[' + str(tmin) + ' ' + str(tmax) + ']'
-            tzuhe.add_row([nday, t[0], t[1], t[2], '--', '--', price, '--', '--', '--'])
+            tzuhe.add_row([nday, inst, name, t[2], '--', maxhold, price, '--', '--', '--'])
         print tzuhe
 
         self.dumpSelect(stocks, nday)
@@ -142,7 +163,7 @@ class KLINE(mockbase):
     def dumpSelect(self, tups, nday):
         f = open('./output/kline/' + nday + '.kl.txt', 'w')
         for t in tups:
-            line = t[0][-6:] + ',KLINE,KLINE,' + nday + ',' + t[1] + ',' + t[2]
+            line = t[0][-6:] + ',KLINE,KLINE,' + nday + ',' + t[1] + ',' + t[2] + ',' + str(t[3])
             f.write(line)
             f.write('\n')
         f.close()
@@ -200,12 +221,6 @@ class KLINE(mockbase):
 
         nxopen = float(self.__opset[dkey])
         nclose = float(self.__clset[inst + '|' + nday])
-
-        # # 过滤低开在黄金分割位下
-        # fibprice = float(self.getMtime()[mkey][30])
-        # if fibprice != 1024 and (nxopen - fibprice) / fibprice < -0.005:
-        #     print 'DEBUG:', nday, 'DROP BarOpen Fibs', inst, name, nxday, fibprice, nxopen
-        #     ret = False
 
         # 过滤高空3个点或者低开1个点的价格
         jump = (nxopen - nclose) / nclose 
