@@ -9,6 +9,7 @@ mkdir -p data
 mkdir -p output
 mkdir -p logs
 mkdir -p output/nbs/
+mkdir -p output/kline/
 
 # download data
 # bash download.sh
