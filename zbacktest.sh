@@ -9,6 +9,10 @@ echo $day0
 trade='kline'
 
 sday='2006-01-04'
+eday='2016-08-08'
+nohup $py pp_selstock.py -m 'mock' -s $sday -d $eday -t $trade 1>logs/$sday'_'$eday'.log' 2>&1 &
+
+sday='2006-01-04'
 eday='2006-12-29'
 nohup $py pp_selstock.py -m 'mock' -s $sday -d $eday -t $trade 1>logs/$sday'_'$eday'.log' 2>&1 &
 
