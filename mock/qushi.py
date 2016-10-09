@@ -107,7 +107,7 @@ class qushi(mockbase):
                     sellprice = ref
         return sellprice
 
-    def sell(self, tup, tday, nxday, instlast, baseday=None):
+    def sell(self, tup, tday, nxday, instlast, yday, baseday=None):
         sellprice = None
         return sellprice
 # 
