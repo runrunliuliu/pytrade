@@ -210,7 +210,7 @@ class NBS(mockbase):
                     sellprice = ref
         return sellprice
 
-    def sell(self, tup, tday, nxday, instlast, baseday=None):
+    def sell(self, tup, tday, nxday, instlast, yday, baseday=None):
         sellprice = None
 
         sigday = tup[0]
