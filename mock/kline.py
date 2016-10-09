@@ -163,7 +163,7 @@ class KLINE(mockbase):
     def dumpSelect(self, tups, nday):
         f = open('./output/kline/' + nday + '.kl.txt', 'w')
         for t in tups:
-            line = t[0][-6:] + ',KLINE,KLINE,' + nday + ',' + t[1] + ',' + t[2] + ',' + str(t[3])
+            line = t[0][-6:] + ',hcqs,ctgd,' + nday + ',' + t[1] + ',' + t[2] + ',' + str(t[3])
             f.write(line)
             f.write('\n')
         f.close()
