@@ -433,9 +433,9 @@ class FakeTrade(object):
         buyprice = self.__trade.buy(tup, nxday, nday, tp)
         return buyprice 
 
-    def sell(self, tup, tday, nxday, baseday=None):
+    def sell(self, tup, tday, nxday, yday, baseday=None):
         sellprice = None
-        sellprice = self.__trade.sell(tup, tday, nxday, self.__instlast, baseday)
+        sellprice = self.__trade.sell(tup, tday, nxday, self.__instlast, yday)
         return sellprice
 
     def updateStopWinLoss(self, tp):
@@ -482,7 +482,7 @@ class FakeTrade(object):
             (yday, nxday) = self.getDays(z[1][0], nday)
             buy    = z[2]
             shares = z[3]
-            sp  = self.sell(z, nday, nxday)
+            sp  = self.sell(z, nday, nxday, yday)
 
             (ret, comment, ref) = self.forceDrop(z[1], nday, forcetp + 1, nxday)
             if ret > 0:
