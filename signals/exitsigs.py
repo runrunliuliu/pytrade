@@ -82,16 +82,15 @@ class ExitSignals(object):
         return ret
 
     # 巨阴破位
-    def JYPW(self, code, nday, nxday, price):
+    def JYPW(self, code, yday, nday, nxday, price):
         ret = 0
+        ykey = code + '|' + yday
         nkey = code + '|' + nday
-        skey = code + '|' + nxday
 
+        ycl = float(self.__cl[ykey])
         ncl = float(self.__cl[nkey])
-        sop = float(self.__op[skey])
-        scl = float(self.__cl[skey])
         
-        if sop > price and scl < price and (scl - ncl) / ncl < -0.08:
+        if ycl > price and ncl < price and (ncl - ycl) / ycl < -0.08:
             ret = 1
         return ret
 #
