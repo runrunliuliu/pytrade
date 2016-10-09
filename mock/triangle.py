@@ -227,7 +227,7 @@ class triangle(mockbase):
                     return (ret, comment, -1)
         return (ret, comment, -1)
 
-    def sell(self, tup, tday, nxday, instlast, baseday=None):
+    def sell(self, tup, tday, nxday, instlast, yday, baseday=None):
         sellprice = None
         tup  = tup[1]
         inst = tup[0]
