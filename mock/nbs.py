@@ -238,14 +238,6 @@ class NBS(mockbase):
                 tprice = float(t[3])
                 break
 
-        # TF背离止损
-        # if sellprice is None:
-        #     tfbl = self.getMtime()[mkey][27]
-        #     if tfbl == 1:
-        #         print 'DEBUG:', 'TFBL', inst, tday, cls
-        #         sellprice = ops 
-        #         return sellprice
-
         if self.getSZmtime() == 1:
             # 买入第三日不收在突破日收盘之上，卖出
             holds = self.__exit.HoldTime(inst, sigday, tday)
