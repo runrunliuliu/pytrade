@@ -74,7 +74,6 @@ class KLINE(mockbase):
 
     # 选股
     def select(self, tup, nday):
-        maxhold = 2
 
         zuhe  = tup[0]
         ozuhe = tup[1]
@@ -84,6 +83,7 @@ class KLINE(mockbase):
         tzuhe.float_format = '.4'
         tzuhe.align = 'l'
         for k in ozuhe:
+            maxhold = 2
             inst   = k
             sigday = zuhe[k]
             trades = self.getTrades()[sigday]
