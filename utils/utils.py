@@ -305,14 +305,24 @@ class FakeTrade(object):
         self.__zuhe   = []
         self.__switch = []
 
-        self.__stopwin = 1.05
-        self.__stoplos = 0.97
+        self.__stopwin     = 1.11
+        self.__stoplos     = 0.92
+        self.__bearstopwin = 1.05
+        self.__bearstoplos = 0.92
+        self.__numzuhe     = 10 
+        self.__maxbuy      = 2 
 
-        self.__bearstopwin = 1.11
-        self.__bearstoplos = 0.89
+        if trade == 'nbs':
+            self.__stopwin     = 1.05
+            self.__stoplos     = 0.97
+            self.__bearstopwin = 1.11
+            self.__bearstoplos = 0.89
+            self.__numzuhe     = 6
+            self.__maxbuy      = 3
 
-        self.__numzuhe = 6
-        self.__maxbuy  = 3
+        if trade == 'kline':
+            self.__numzuhe = 6
+            self.__maxbuy  = 3
 
         self.__forcetp = forcetp 
 
