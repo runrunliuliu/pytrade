@@ -38,6 +38,11 @@ class KLINE(mockbase):
             self.loadMtime(dirs, code)
             self.loadTrades(dirs, subdir, code)
 
+        self.__name = subdir
+
+    def getName(self):
+        return self.__name
+
     def resortTrades(self, tups):
         return tups
 
