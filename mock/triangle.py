@@ -40,6 +40,11 @@ class triangle(mockbase):
             self.loadOB(dirs, subdir, code)
             self.loadTrades(dirs, subdir, code)
 
+        self.__name = subdir
+
+    def getName(self):
+        return self.__name
+
     def initExit(self, mtime, instdaymap, lastdayk):
         self.__exit = None 
 
@@ -128,6 +133,13 @@ class triangle(mockbase):
             ret = False
             print 'DEBUG:', nday, 'Drop Suspension ', inst, name, nxday, dkey
             return buyprice
+
+        trades = self.getTrades()[nday]
+        for t in trades:
+            if t[0] == inst and float(t[2]) > 4000:
+                print 'DEBUG', 'Drop Buy MAGIC SCORE', nday, inst, t[1], float(t[2])
+                return buyprice
+
         nxopen = float(self.__opset[dkey])
         nclose = float(self.__clset[inst + '|' + nday])
         # 3. 过滤低于T + 1日开盘导致死叉的价格
