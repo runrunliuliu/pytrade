@@ -192,8 +192,24 @@ class KLINE(mockbase):
             return buyprice
 
         trades = self.getTrades()[nday]
+        ma5d   = float(self.getMtime()[mkey][34])
+
         for t in trades:
             if t[0] == inst:
+                bflag = float(t[5])
+                score = float(t[2])
+
+                if (bflag == 8 or bflag == 2) and ma5d < -0.02:
+                    print 'DEBUG', 'Drop Buy MA5_Direct', nday, inst, name, t[2], t[5], ma5d
+                    return buyprice
+
+                if bflag > 900:
+                    if ((bflag >= 931 and bflag <= 933) or (bflag >= 921 and bflag <= 924)) and score >= 0:
+                        jhold = -0.01
+                    else:
+                        print 'DEBUG', 'Drop Buy GOLD SEGMENT', nday, inst, name, bflag, score
+                        return buyprice
+
                 if float(t[5]) == 5:
                     return buyprice
 
@@ -306,6 +322,12 @@ class KLINE(mockbase):
             if t[0] == inst:
                 if float(t[5]) == 8 or float(t[5]) == 6:
                     maxhold = 3
+                    break
+                if float(t[5]) == 923 or float(t[5]) == 933:
+                    maxhold = 3
+                    break
+                if float(t[5]) == 922 or float(t[5]) == 932 or float(t[5]) == 921:
+                    maxhold = 4
                     break
 
         # 买入第二日卖出
