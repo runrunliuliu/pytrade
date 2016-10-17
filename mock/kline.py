@@ -99,6 +99,12 @@ class KLINE(mockbase):
                     if float(t[5]) == 8 or float(t[5]) == 6:
                         maxhold = 3
                         break
+                    if float(t[5]) == 923 or float(t[5]) == 933:
+                        maxhold = 3
+                        break
+                    if float(t[5]) == 922 or float(t[5]) == 932 or float(t[5]) == 921:
+                        maxhold = 4
+                        break
             # 长阴破位离场
             mkey     = k + '|' + sigday
             fibprice = float(self.getMtime()[mkey][30])
@@ -122,39 +128,20 @@ class KLINE(mockbase):
         for t in trades:
             inst    = t[0]
             name    = t[1]
+            bflag   = float(t[5])
             jhold   = -0.50
             maxhold = 2
 
-            if float(t[5]) == 8 or float(t[5]) == 6:
-                maxhold = 3
+            maxhold = self.setMaxHold(bflag)
 
-            if float(t[5]) == 5:
-                print 'DEBUG', 'Drop Buy CROSS_STAR', nday, inst, name, t[5]
+            # cxshort过滤
+            mkey = inst + '|' + nday
+            ma5d = float(self.getMtime()[mkey][34])
+            ind  = [ma5d, ]
+            jhold = self.stockfilter(t, nday, inst, name, ind)
+            if jhold is None:
                 continue
-
-            if float(t[2]) > 5000:
-                print 'DEBUG', 'Drop Buy BIGGER SCORE', nday, inst, name, t[2], t[5]
-                continue
-
-            if float(t[5]) == 5 or float(t[5]) == 7:
-                jhold = 0.00
-                if float(t[2]) < 0:
-                    print 'DEBUG', 'Drop Buy SCORE < 0', nday, inst, name, t[2], t[5]
-                    continue
-
-            if float(t[5]) == 6:
-                jhold = -0.04
-
-            if float(t[5]) == 8:
-                jhold = -0.04
-                if float(t[2]) < 0:
-                    print 'DEBUG', 'Drop Buy SCORE < 0', nday, inst, name, t[2], t[5]
-                    continue
-
-            if (float(t[5]) == 2 or float(t[5]) == 4) and float(t[2]) < -100:
-                print 'DEBUG', 'Drop Buy MAGIC SCORE', nday, inst, t[2], t[5]
-                continue
-
+            
             nclose = float(self.__clset[t[0] + '|' + nday])
             tmin = "{:.4f}".format(nclose * (1 + jhold)) 
             tmax = "{:.4f}".format(nclose * 1.03)
@@ -164,6 +151,61 @@ class KLINE(mockbase):
         print tzuhe
 
         self.dumpSelect(stocks, nday)
+
+    # 设置最大持仓时间
+    def setMaxHold(self, tp):
+        maxhold = 2
+        if tp == 8 or tp == 6:
+            maxhold = 3
+        if tp == 923 or tp == 933:
+            maxhold = 3
+        if tp == 922 or tp == 932 or tp == 921:
+            maxhold = 4
+        return maxhold
+
+    # 选股过滤器
+    def stockfilter(self, t, nday, inst, name, ind):
+        jhold = -0.50
+        ma5d  = ind[0]
+        bflag = float(t[5])
+        score = float(t[2])
+
+        if bflag == 5:
+            return None
+
+        if (bflag == 8 or bflag == 2) and ma5d < -0.02:
+            print 'DEBUG', 'Drop Buy MA5_Direct', nday, inst, name, bflag, score, ma5d
+            return None 
+
+        if bflag > 900:
+            if ((bflag >= 931 and bflag <= 933) or (bflag >= 921 and bflag <= 924)) and score >= 0:
+                jhold = -0.01
+            else:
+                print 'DEBUG', 'Drop Buy GOLD SEGMENT', nday, inst, name, bflag, score
+                return None
+
+        if score > 5000:
+            print 'DEBUG', 'Drop Buy BIGGER SCORE', nday, inst, name, bflag, score
+            return None
+
+        if bflag == 5 or bflag == 7:
+            jhold = 0.00
+            if score < 0:
+                return None
+
+        if bflag == 6:
+            jhold = -0.04
+
+        if bflag == 8:
+            jhold = -0.04
+            if score < 0:
+                return None 
+
+        if (bflag == 2 or bflag == 4) and score < -100:
+            print 'DEBUG', 'Drop Buy MAGIC SCORE', nday, inst, bflag, score
+            return None
+
+        return jhold
 
     def dumpSelect(self, tups, nday):
         f = open('./output/kline/' + nday + '.kl.txt', 'w')
@@ -193,46 +235,14 @@ class KLINE(mockbase):
 
         trades = self.getTrades()[nday]
         ma5d   = float(self.getMtime()[mkey][34])
-
+        ind    = [ma5d, ]
         for t in trades:
             if t[0] == inst:
-                bflag = float(t[5])
-                score = float(t[2])
-
-                if (bflag == 8 or bflag == 2) and ma5d < -0.02:
-                    print 'DEBUG', 'Drop Buy MA5_Direct', nday, inst, name, t[2], t[5], ma5d
+                jhold = self.stockfilter(t, nday, inst, name, ind)
+                if jhold is None:
                     return buyprice
-
-                if bflag > 900:
-                    if ((bflag >= 931 and bflag <= 933) or (bflag >= 921 and bflag <= 924)) and score >= 0:
-                        jhold = -0.01
-                    else:
-                        print 'DEBUG', 'Drop Buy GOLD SEGMENT', nday, inst, name, bflag, score
-                        return buyprice
-
-                if float(t[5]) == 5:
-                    return buyprice
-
-                if float(t[2]) > 5000:
-                    print 'DEBUG', 'Drop Buy BIGGER SCORE', nday, inst, name, t[2], t[5]
-                    return buyprice
-
-                if float(t[5]) == 5 or float(t[5]) == 7:
-                    jhold = 0.00
-                    if float(t[2]) < 0:
-                        return buyprice
-
-                if float(t[5]) == 6:
-                    jhold = -0.04
-
-                if float(t[5]) == 8:
-                    jhold = -0.04
-                    if float(t[2]) < 0:
-                        return buyprice
-
-                if (float(t[5]) == 2 or float(t[5]) == 4) and float(t[2]) < -100:
-                    print 'DEBUG', 'Drop Buy MAGIC SCORE', nday, inst, t[2], t[5]
-                    return buyprice
+                else:
+                    break
 
         dkey = inst + '|' + nxday
         if dkey not in self.__opset:
@@ -302,11 +312,6 @@ class KLINE(mockbase):
 
         cls  = float(self.__clset[skey])
         ops  = float(self.__opset[skey])
-        # tkdk = self.__exit.tkdk(inst, tday, nxday)
-        # if tkdk == 1:
-        #     print 'DEBUG', 'TKDK SELL on OPEN ', tday, nxday, inst 
-        #     sellprice = ops 
-        #     return sellprice
 
         mkey     = inst + '|' + sigday 
         # 长阴破位离场
