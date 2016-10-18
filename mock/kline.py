@@ -95,16 +95,10 @@ class KLINE(mockbase):
             name   = ''
             for t in trades:
                 if t[0] == k:
-                    name   = t[1]
-                    if float(t[5]) == 8 or float(t[5]) == 6:
-                        maxhold = 3
-                        break
-                    if float(t[5]) == 923 or float(t[5]) == 933:
-                        maxhold = 3
-                        break
-                    if float(t[5]) == 922 or float(t[5]) == 932 or float(t[5]) == 921:
-                        maxhold = 4
-                        break
+                    name  = t[1]
+                    bflag = float(t[5])
+                    maxhold = 2
+                    maxhold = self.setMaxHold(bflag)
             # 长阴破位离场
             mkey     = k + '|' + sigday
             fibprice = float(self.getMtime()[mkey][30])
@@ -161,6 +155,8 @@ class KLINE(mockbase):
             maxhold = 3
         if tp == 922 or tp == 932 or tp == 921:
             maxhold = 4
+        if tp == 10:
+            maxhold = 5
         return maxhold
 
     # 选股过滤器
@@ -169,6 +165,12 @@ class KLINE(mockbase):
         ma5d  = ind[0]
         bflag = float(t[5])
         score = float(t[2])
+
+        if bflag == 10:
+            if ma5d < -0.02 or score < 0:
+                print 'DEBUG', 'Drop Buy MA5 or SCORE', nday, inst, name, bflag, score, ma5d
+                return None
+            print 'DEBUG', 'MUST Buy', nday, inst, name, bflag, score, ma5d
 
         if bflag == 5:
             return None
@@ -325,16 +327,8 @@ class KLINE(mockbase):
         trades = self.getTrades()[sigday]
         for t in trades:
             if t[0] == inst:
-                if float(t[5]) == 8 or float(t[5]) == 6:
-                    maxhold = 3
-                    break
-                if float(t[5]) == 923 or float(t[5]) == 933:
-                    maxhold = 3
-                    break
-                if float(t[5]) == 922 or float(t[5]) == 932 or float(t[5]) == 921:
-                    maxhold = 4
-                    break
-
+                bflag = float(t[5])
+                maxhold = self.setMaxHold(bflag)
         # 买入第二日卖出
         holds = self.__exit.HoldTime(inst, sigday, tday)
 
