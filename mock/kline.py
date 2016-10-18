@@ -156,7 +156,7 @@ class KLINE(mockbase):
         if tp == 922 or tp == 932 or tp == 921:
             maxhold = 4
         if tp == 10:
-            maxhold = 5
+            maxhold = 4
         return maxhold
 
     # 选股过滤器
