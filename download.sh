@@ -5,6 +5,8 @@ echo $day0
 
 python dbaction.py -a fetchindex
 python download.py $day0
+sleep 10
+python download.py $day0
 
 # scp himalayas@139.129.99.51:/home/himalayas/apps2/qts/pytrade2/data/dayk/* ./data/dayk/
 rsync -uhavzm --stats --progress himalayas@139.129.99.51:/home/himalayas/apps2/qts/pytrade2/data/dayk.tar.gz .
