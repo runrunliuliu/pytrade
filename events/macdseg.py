@@ -34,6 +34,7 @@ class MacdSeg(eventprofiler.Predicate):
         self.__dropout = None
 
         self.__cxshort  = [] 
+        self.__qcg      = [] 
         self.__observed = [] 
         self.__qushi    = []
         self.__dt       = []
@@ -48,11 +49,11 @@ class MacdSeg(eventprofiler.Predicate):
         self.__baseinfo = baseinfo
 
         self.__trianglesignal = OrderedDict() 
-        self.__qushisignal = OrderedDict() 
-        self.__dtsignal = OrderedDict() 
-        self.__nbsignal = OrderedDict()
-        self.__qsline = OrderedDict()
-        self.__ctsignal = OrderedDict()
+        self.__qushisignal    = OrderedDict() 
+        self.__dtsignal       = OrderedDict() 
+        self.__nbsignal       = OrderedDict()
+        self.__qsline         = OrderedDict()
+        self.__ctsignal       = OrderedDict()
 
         self.__qs = []
 
@@ -98,6 +99,9 @@ class MacdSeg(eventprofiler.Predicate):
 
     def getCXshort(self):
         return self.__cxshort
+
+    def getQCG(self):
+        return self.__qcg
 
     def getQUSHI(self):
         return self.__qushi
@@ -295,6 +299,9 @@ class MacdSeg(eventprofiler.Predicate):
 
         CT  = self.__macd[instrument][-1][22]
         self.__ct.append((dateTime, CT))
+
+        QCG = self.__macd[instrument][-1][23]
+        self.__qcg.append((dateTime, QCG))
 
         self.__ftDes = self.__macd[instrument][-1][15]
         self.__ftInc = self.__macd[instrument][-1][16]
