@@ -93,6 +93,9 @@ def main(plot, argv):
     if period == 'month':
         dirpath = './data/monk/'
         freq = bar.Frequency.MONTH
+    if period == '15min':
+        dirpath = './data/15mink/'
+        freq = bar.Frequency.MIN15
 
     fs = FileUtils('','','')
     codearr = fs.os_walk(dirpath)
@@ -112,21 +115,22 @@ def main(plot, argv):
     # instfiles = [("SZ002248.csv","SZ002248")]
     # instfiles = [("SH600436.csv","SH600436")]
     # instfiles = [("SH601801.csv","SH601801")]
-    # instfiles = [("SH603519.csv","SH603519")]
+    # instfiles = [("SH603558.csv","SH603558")]
+    # instfiles = [("SH600395.csv","SH600395")]
+    # instfiles = [("SH600256.csv","SH600256")]
+    # instfiles = [("SH603800.csv","SH603800")]
     # instfiles = [("SH600900.csv","SH600900")]
-    # instfiles = [("SH600079.csv","SH600079")]
-    # instfiles = [("SH600383.csv","SH600383")]
-    # instfiles = [("SH600149.csv","SH600149")]
     # instfiles = [("SH601668.csv","SH601668")]
-    # instfiles = [("SH603609.csv","SH603609")]
-    # instfiles = [("SZ300121.csv","SZ300121")]
-    instfiles = [("SZ000533.csv","SZ000533")]
-    # instfiles = [("SZ300249.csv","SZ300249")]
-    # instfiles = [("SZ002043.csv","SZ002043")]
-    # instfiles = [("SZ000413.csv","SZ000413")]
-    # instfiles = [("SH603869.csv","SH603869")]
-    # instfiles = [("SH603618.csv","SH603618")]
-    # instfiles = [("ZS000001.csv","ZS000001")]
+    # instfiles = [("SH600202.csv","SH600202")]
+    # instfiles = [("SZ300136.csv","SZ300136")]
+    # instfiles = [("SZ002201.csv","SZ002201")]
+    # instfiles = [("SZ002092.csv","SZ002092")]
+    # instfiles = [("SZ300287.csv","SZ300287")]
+    # instfiles = [("SZ300221.csv","SZ300221")]
+    # instfiles = [("SZ002517.csv","SZ002517")]
+    # instfiles = [("bk4301670.csv","bk4301670")]
+    # instfiles = [("SH600052.csv","SH600052")]
+    instfiles = [("ZS000001.csv","ZS000001")]
     # instfiles = [("ZS399006.csv","ZS399006")]
     insts  = [] 
 
