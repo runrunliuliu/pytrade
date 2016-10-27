@@ -107,8 +107,8 @@ class FileUtils(object):
 class DumpFeature(object):
 
     def __init__(self, obj, instfiles, dirpath):
-        self.__inst = instfiles
-        self.__dir  = dirpath
+        self.__inst   = instfiles
+        self.__dir    = dirpath
 
         self.__gd = obj.getGD()
         self.__hl = obj.getHL()
@@ -123,6 +123,7 @@ class DumpFeature(object):
         self.__dropout = obj.getDropOut()
 
         self.__cxshort = obj.getCXshort()
+        self.__qcg     = obj.getQCG()
         
         self.__qushi = obj.getQUSHI()
         self.__dt    = obj.getDT()
@@ -151,6 +152,7 @@ class DumpFeature(object):
         self.Drop2csv('triangle', 0, 'drop')
         self.Ob2csv('triangle', 0, 'ob')
         self.CX2csv('mtime')
+        self.QCG2csv('qcg')
        
         # 趋势线策略 
         self.TradeSignal2csv('qushi', 1, 'trade')
@@ -163,6 +165,21 @@ class DumpFeature(object):
 
         # K-LINE策略 
         self.TradeSignal2csv('kline', 4, 'trade')
+
+    def QCG2csv(self, subdir):
+        dirs = self.__dir + '/' + subdir 
+        if not os.path.exists(dirs):
+            os.makedirs(dirs)
+        f = open(dirs + '/' + self.__inst[0][1] + '.ft.csv', 'w')
+        f.write('1date,2kdj,3macd,4sxy,5zdf,6td1,7td2,8td3\n')
+        for item in self.__qcg:
+            if item is not None and item[1] is not None:
+                v = item[1]
+                out = ''
+                for t in v:
+                    out = out + ',' + str(t)
+                f.write(item[0].strftime('%Y-%m-%d') + out)
+                f.write('\n')
 
     def CX2csv(self, subdir):
         dirs = self.__dir + '/' + subdir 
