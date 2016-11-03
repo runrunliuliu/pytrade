@@ -171,7 +171,8 @@ class DumpFeature(object):
         if not os.path.exists(dirs):
             os.makedirs(dirs)
         f = open(dirs + '/' + self.__inst[0][1] + '.ft.csv', 'w')
-        f.write('1date,2kdj,3macd,4sxy,5zdf,6td1,7td2,8td3\n')
+        f.write('1date,2kdj,3macd1,4sxy,5zdf,6td1,7td2,8td3,9macd2,10macd3,11macd4,' \
+                + '12macd5,13macd6\n')
         for item in self.__qcg:
             if item is not None and item[1] is not None:
                 v = item[1]
