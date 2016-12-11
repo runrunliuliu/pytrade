@@ -1,6 +1,7 @@
 # coding:utf-8
 from collections import OrderedDict
 from datetime import datetime as dt
+import re
 
 
 class Merge(object):
@@ -25,6 +26,15 @@ class Merge(object):
 
         self.__dtzq = dict()
         self.__dind = []
+       
+        self.__ft2hd_d = dict()
+        for line in open('./conf/header.conf'):
+            nline = line.strip()
+            if nline.startswith('#'):
+                print 'DEBUG', nline
+                continue
+            arr = nline.split(',')
+            self.__ft2hd_d[arr[1]] = arr[0]
 
     def loadBaseDayK(self, dpath):
         linenum = 0
@@ -87,7 +97,7 @@ class Merge(object):
         for k,v in self.__min15k.iteritems():
             cnt     = 1 
             kdj     = '0,0' 
-            macd    = '0,1024201'
+            macd    = '1024201,0'
             # macd  = '0,0'
             kdj_do  = 0
             macd_do = 0
@@ -192,13 +202,13 @@ class Merge(object):
         return ret
 
     # Feature from LW
-    def loadFT2(self, fname):
+    def loadFT3(self, fname):
         cnt     = 0
         header  = ''
-        ft2dict = dict()
+        ft3dict = dict()
         for line in open(self.__output + '/' + fname):
             if cnt == 0:
-                header = line.strip()[5:]
+                header = line.strip()[4:]
             else:
                 arr  = line.strip().split(',')
                 day  = dt.strptime(arr[0], "%Y%m%d")
@@ -208,13 +218,80 @@ class Merge(object):
                     if "%" in arr[i]:
                         tmp = "{:.4f}".format(float(arr[i][:-1]) / 100.0)
                         fts.append(tmp)
+                    else:
+                        fts.append(arr[i])
+                ft3dict[sday] = fts
+            cnt = cnt + 1
+        return(header, ft3dict)
+
+    # Feature from LW
+    def loadFT2(self, fname):
+        cnt     = 0
+        header  = ''
+        ft2dict = dict()
+        for line in open(self.__output + '/' + fname):
+            if cnt == 0:
+                header = line.strip()[5:]
+            else:
+                arr  = line.strip().split(',')
+
+                day  = dt.strptime(arr[0], "%Y%m%d")
+                sday = day.strftime('%Y-%m-%d')
+                fts = []
+
+                for i in range(1, len(arr)):
+                    if "%" in arr[i]:
+                        tmp = "{:.4f}".format(float(arr[i][:-1]) / 100.0)
+                        fts.append(tmp)
                     elif len(arr[i]) == 0:
                         fts.append('1024201')
                     else:
                         fts.append(arr[i])
+                
+                # Feature Handles
+                for k in range(0, len(fts)):
+                    if k == 19 and int(fts[18]) <= 2:
+                        fts[k]     = '1024201'
+                        fts[k - 1] = '1024201'
                 ft2dict[sday] = fts
             cnt = cnt + 1
         return(header, ft2dict)
+
+    def transFT2(self, fname):
+        f    = open(self.__output + '/' + self.__inst + '.ft3.csv', 'w')
+        fday = open(self.__output + '/' + self.__inst + '.actday.csv', 'w')
+        path = self.__output + '/'  + fname
+        # Get Header Index
+        hd_index = dict()
+        for line in open(path):
+            arr = line.strip().split('\t')
+            for i in range(0, len(arr)):
+                hd_index[i] = arr[i]
+            break
+        cnt  = 0
+        headers = []
+        for line in open(path):
+            arr = line.strip().split('\t')
+            fts = []
+            for i in range(0, len(arr)):
+                if hd_index[i] not in self.__ft2hd_d:
+                    continue
+                if cnt == 0:
+                    headers.append(self.__ft2hd_d[arr[i]])
+                else:
+                    if len(arr[i]) == 0:
+                        arr[i] = '1024201'
+                    else:
+                        if hd_index[i].decode('utf8') == u'上证涨跌幅' and float(arr[i]) <= -0.01:
+                            fday.write(arr[0] + ',' + arr[i] + '\n')
+                    fts.append(arr[i])
+            if cnt == 0:
+                f.write(','.join(headers))
+            nline = ','.join(fts)
+            f.write(nline + '\n')
+            cnt = cnt + 1
+        f.close()
+        fday.close()
 
     def combFeatures(self):
 
@@ -225,7 +302,10 @@ class Merge(object):
 
         self.loadDayk('dayk/qcg/' + self.__inst + '.ft.csv')
 
-        (ft2header, ft2dict) = self.loadFT2(self.__inst + '.ft2.csv')
+        self.transFT2('test2.txt')
+
+        # (ft2header, ft2dict) = self.loadFT2(self.__inst + '.ft2.csv')
+        (ft2header, ft2dict) = self.loadFT3(self.__inst + '.ft3.csv')
 
         self.__header = 'day,' + self.__header + ',' + ft2header + ',ret1,ret2,ret3,ret4,ret5,ret6,ret7,ret8'
 
@@ -237,7 +317,9 @@ class Merge(object):
                 ft15k = self.__ft15k[k]
 
             # Get FT2
-            ft2 = ['1024201','1024201','1024201','1024201','1024201','1024201','1024201','1024201','1024201','1024201','1024201','1024201','1024201','1024201','1024201','1024201']
+            ft2 = []
+            for i in range(0, 23):
+                ft2.append('1024201')
             if k in ft2dict:
                 ft2 = ft2dict[k]
             ft2flat = ','.join(ft2)

@@ -172,7 +172,7 @@ class DumpFeature(object):
             os.makedirs(dirs)
         f = open(dirs + '/' + self.__inst[0][1] + '.ft.csv', 'w')
         f.write('1date,2kdj,3macd1,4sxy,5zdf,6td1,7td2,8td3,9macd2,10macd3,11macd4,' \
-                + '12macd5,13macd6\n')
+                + '12macd5,13macd6,14macd7\n')
         for item in self.__qcg:
             if item is not None and item[1] is not None:
                 v = item[1]
@@ -1221,6 +1221,7 @@ def parseinst(codearr, bk='ALL'):
         if len(fsize) > 2:
             continue
         code  = fname[0:8]
+        f1 = code[0:2]
         f2 = code[2:5]
         if bk == 'TEST' and code[2:6] == '3001':
             out.append((fname,code))
@@ -1229,6 +1230,8 @@ def parseinst(codearr, bk='ALL'):
         if bk == 'ZB' and f2 == '600':
             out.append((fname,code))
         if bk == 'ALL':
+            out.append((fname,code))
+        if bk == 'BK' and f1 == 'BK':
             out.append((fname,code))
     return out
 
