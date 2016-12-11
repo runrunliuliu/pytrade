@@ -80,7 +80,7 @@ def main(plot, argv):
     fromDay   = 1
     toMonth   = 2
     toDay     = 24
-    start_time = datetime.datetime(1990,fromMonth,fromDay,00,00)
+    start_time = datetime.datetime(2001,fromMonth,fromDay,00,00)
     end_time   = datetime.datetime(2017,toMonth,toDay,00,00)
     barFilter  = csvfeed.CHINAEquitiesRTH(start_time,end_time)
     baseinfo = instinfo.InstrumentInfo('data/stockinfo.csv')
@@ -96,6 +96,9 @@ def main(plot, argv):
     if period == '15min':
         dirpath = './data/15mink/'
         freq = bar.Frequency.MIN15
+    if period == '30min':
+        dirpath = './data/30mink/'
+        freq = bar.Frequency.MIN30
 
     fs = FileUtils('','','')
     codearr = fs.os_walk(dirpath)
@@ -123,12 +126,12 @@ def main(plot, argv):
     # instfiles = [("SH601668.csv","SH601668")]
     # instfiles = [("SH600202.csv","SH600202")]
     # instfiles = [("SZ300136.csv","SZ300136")]
-    # instfiles = [("SZ002201.csv","SZ002201")]
+    # instfiles = [("SZ002195.csv","SZ002195")]
     # instfiles = [("SZ002092.csv","SZ002092")]
     # instfiles = [("SZ300287.csv","SZ300287")]
     # instfiles = [("SZ300221.csv","SZ300221")]
     # instfiles = [("SZ002517.csv","SZ002517")]
-    # instfiles = [("bk4301670.csv","bk4301670")]
+    # instfiles = [("BK300041.csv","BK300041")]
     # instfiles = [("SH600052.csv","SH600052")]
     instfiles = [("ZS000001.csv","ZS000001")]
     # instfiles = [("ZS399006.csv","ZS399006")]
