@@ -1,10 +1,12 @@
 import datetime
+import re
 import numpy as np
 from datetime import datetime as dt
 import matplotlib
 import matplotlib.pyplot as plt
 from xgboost import plot_tree
 import xgboost as xgb
+import operator
 
 
 # Sample Data
@@ -25,15 +27,38 @@ def datasplit(code, path, splitDay):
     ftrain.close()
     ftest.close()
 
-    ftest_d  = open(path + '/' + code + '.test.csv.debug', 'w')
+    # Write Weight
+    wtrain = open(path + '/' + code + '.train.csv.weight', 'w')
+    wtest  = open(path + '/' + code + '.test.csv.weight', 'w')
+
     sday = dt.strptime(splitDay, "%Y-%m-%d")
+    for line in open(path + '/' + code + '.raw.csv.weight'):
+        arr = line.strip().split(',')
+        cday = dt.strptime(arr[0], "%Y-%m-%d")
+        if cday < sday:
+            wtrain.write(arr[1] + '\n')
+        else:
+            wtest.write(arr[1] + '\n')
+    wtrain.close()
+    wtest.close()
+
+    # For DEBUG
+    ftest_d  = open(path + '/' + code + '.test.csv.debug', 'w')
+    ftest_i  = open(path + '/' + code + '.test.csv.index', 'w')
+    sday     = dt.strptime(splitDay, "%Y-%m-%d")
+    linenum  = 0
     for line in open(path + '/' + code + '.raw.csv.debug'):
         arr = line.strip().split(',')
         cday = dt.strptime(arr[0], "%Y-%m-%d")
         if cday >= sday:
-            tmpday = cday.strftime('%m%d')
-            ftest_d.write(tmpday + arr[1] + '\n')
+            # tmpday = cday.strftime('%m%d')
+            tmpday = cday.strftime('%Y%m%d')
+            ftest_d.write(str(linenum) + arr[1] + '\n')
+            ftest_i.write(str(linenum) + arr[1].split(' ')[0] + ',' + tmpday + '\n')
+
+            linenum = linenum + 1
     ftest_d.close()
+    ftest_i.close()
 
     # Pandas
     def concat(ft):
@@ -67,18 +92,27 @@ def datasplit(code, path, splitDay):
     ftest.close()
 
 
+def loadWeight(filename):
+    weights = []
+    for line in open(filename + '.weight'):
+        w = float(line.strip())
+        weights.append(w)
+    return weights
+
+
 def loadFtDict(path, code):
     fts    = []
     ftname = dict()
     for line in open(path + '/' + code + '.ft.dict'):
         arr = line.strip().split(',')
-        ftname[arr[0]] = arr[1]
+        ftname['f' + arr[0]] = arr[1]
         fts.append(arr[0])
     return (fts, ftname)
 
 
 def featureImportance(path, code, bst):
-    xgb.plot_importance(bst, importance_type="gain")
+    (fts, ftname) = loadFtDict(path, code)
+    xgb.plot_importance(bst, importance_type="gain", ftname=ftname)
     plt.savefig('importance.png')
 
     # (fts, ftname) = loadFtDict(path, code)
@@ -98,7 +132,141 @@ def featureImportance(path, code, bst):
     # plt.show()
 
 
-def showTree(bst):
-    xgb.plot_tree(bst, num_trees=299, fontsize='24', rankdir='LR', size="7.75,10.25")
+def forwardCheck(mkey, for_map, dicts):
+    used = set()
+    arr  = []
+    for i in range(1, 4):
+        key = mkey + i
+        if key < len(for_map) and for_map[key] in dicts:
+            if for_map[key] in used:
+                continue
+            else:
+                used.add(for_map[key])
+                arr.append((for_map[key], i))
+    if len(used) > 0:
+        return arr 
+    else:
+        return None 
+
+
+def showTree(bst, ntree):
+    xgb.plot_tree(bst, num_trees=ntree, fontsize='24', rankdir='LR', size="7.75,10.25")
     plt.savefig('tree.png')
+
+
+def debugTree(bst, xg_test):
+    # 0909
+    nsample = 171
+    # 0908
+    # nsample = 170 
+    # 0907
+    # nsample = 169
+
+    linenum = 0
+    debugTree = bst.predict(xg_test, pred_leaf=True)
+
+    _NODEPAT = re.compile(r'(\d+):\[(.+)\]')
+    _LEAFPAT = re.compile(r'(\d+):(leaf=.+)')
+    _EDGEPAT = re.compile(r'yes=(\d+),no=(\d+),missing=(\d+)')
+    # _EDGEPAT = re.compile(r'yes=(\d+),no=(\d+),missing=(\d+),gain=(\d+.\d+)')
+    # _EDGEPAT2 = re.compile(r'yes=(\d+),no=(\d+)')
+
+    arrNodes = []
+    arrEdges = []
+    leafdict = dict()
+
+    def _parse_node(text):
+        match = _NODEPAT.match(text)
+        if match is not None:
+            node = match.group(1)
+            # print 'Node:', node, text
+            arrNodes.append(text)
+        match = _LEAFPAT.match(text)
+        if match is not None:
+            node = match.group(1)
+            # print 'Leaf:', node, text
+            leafdict[node] = text
+
+    def travelTree(leafnode):
+        nids  = set()
+        dnode = dict()
+        dnode['0'] = 'ROOT' 
+        for i in range(0, len(arrNodes)):
+            (yes, no, missing) = arrEdges[i]
+            nd                 = arrNodes[i]
+
+            arch_Y = '|Y|'
+            if yes == missing:
+                arch_Y = '|Y|M|'
+            arch_N = '|N|'
+            if no == missing:
+                arch_N = '|N|M|'
+ 
+            dnode[yes] = nd + arch_Y
+            dnode[no] = nd + arch_N
+
+            nids.add(yes)
+            nids.add(no)
+        output = ''
+        ntext = dnode[leafnode]
+        pid   = ntext.split(':')[0]
+        nodes = [] 
+        while 1:
+            output = ntext + '-->' + output
+            if pid == '0':
+                break
+            ntext = dnode[pid] 
+            pid   = ntext.split(':')[0]
+            nodes.append(ntext.split(':')[1])
+        ldesc = leafdict[leafnode]
+        return (output + 'Leaf_' + ldesc, ldesc.split("=")[1], nodes)
+
+    for d in debugTree:
+        linenum = linenum + 1
+        if linenum == nsample:
+            score = []
+            negnodes = dict()
+            posnodes = dict()
+            for i in range(0, len(d)):
+                if i % 2 == 1:
+                    continue
+                tree = bst.get_dump(with_stats=False)[i].split()
+                for k, text in enumerate(tree):
+                    if text[0].isdigit():
+                        _parse_node(text) 
+                    else:
+                        if k == 0:
+                            raise ValueError('Unable to parse given string as tree')
+                        match = _EDGEPAT.match(text)
+                        if match is not None:
+                            yes, no, missing = match.groups()
+                        arrEdges.append((yes, no, missing))
+                (desc, lscore, nodes) = travelTree(str(d[i]))
+
+                def add2nodes(nodes, dictnodes):
+                    for n in nodes:
+                        cnt = 1
+                        if n in dictnodes:
+                            cnt = dictnodes[n] + 1
+                        dictnodes[n] = cnt
+
+                if float(lscore) > 0:
+                    add2nodes(nodes, posnodes)
+                if float(lscore) < 0:
+                    add2nodes(nodes, negnodes)
+
+                if float(lscore) < -0.05:
+                    print i, d[i], len(d), desc
+                if float(lscore) > 0.05:
+                    print i, d[i], len(d), desc
+
+                score.append(float(lscore))
+
+            sorted_neg = sorted(negnodes.items(), key=operator.itemgetter(1))
+            print 'neg:', sorted_neg[-3:]
+
+            sorted_pos = sorted(posnodes.items(), key=operator.itemgetter(1))
+            print 'pos:', sorted_pos[-3:]
+
+            print np.sum(score)
 #
