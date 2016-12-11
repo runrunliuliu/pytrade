@@ -1,11 +1,13 @@
 library(quantmod)
 
+png('rplot.png', width=400,height=400,res=72)
+
 ticker <- 'ZS000001'
 # ticker <- 'SH600787'
 # ticker <- 'SH601069'
 # ticker <- 'SH600467'
-ticker <- 'SH603019'
-ticker <- 'SZ002195'
+# ticker <- 'SH603019'
+# ticker <- 'SZ002195'
 # ticker <- 'SZ300406'
 # ticker <- 'SZ300315'
 # ticker <- 'SZ300329'
@@ -20,8 +22,8 @@ gpath <- paste('/Users/liu/apps/qts/pytrade/data', path, ticker,'.gd.csv',sep=''
 gd <- read.csv(gpath,colClasses=c('character','numeric'),head=TRUE,sep=",")
 
 qpath <- paste('/Users/liu/apps/qts/pytrade/data',path,sep='')
-quotes <- getSymbols(ticker, dir= qpath, src="csv", env= data, auto.assign=FALSE)
-quotes <- quotes['2015-04::']
+quotes_raw <- getSymbols(ticker, dir= qpath, src="csv", env= data, auto.assign=FALSE)
+quotes <- quotes_raw['2015-12::']
 
 hpath <- paste('/Users/liu/apps/qts/pytrade/data',path, ticker,'.hcluster.csv',sep='')
 hls <- read.csv(hpath,colClasses=c('numeric','numeric', 'numeric', 'numeric', 'numeric'),head=TRUE,sep=",")
@@ -34,6 +36,7 @@ valley <- read.csv(valleypath,colClasses=c('character','numeric','character','nu
 
 # IMPORT INIT VARIABLE
 nclose <- tail(as.numeric(quotes[, grep("Close", colnames(quotes), ignore.case = TRUE)]),n=1)
+headdate <- head(index(quotes), n = 1)
 basedate <- tail(index(quotes), n = 1)
 minY <- min(quotes[,3])
 maxY <- max(quotes[,2])
@@ -52,15 +55,15 @@ for(i in seq(length(index(peek)))){
 	v2 = peek[i,4]
 	peekres <- c()
 	peekval <- c()
-	t1 <- which(index(quotes) == g1)[1] 
-	t2 <- which(index(quotes) == g2)[1] 
+	t1 <- which(index(quotes_raw) == g1)[1] 
+	t2 <- which(index(quotes_raw) == g2)[1] 
 	
 	if(is.na(t1) || is.na(t2)){
 		next
 	}
 	
 # 配对顶点，计算顶点插值
-	peekline = rep(NA, length(index(quotes)))
+	peekline = rep(NA, length(index(quotes_raw)))
 	x0 <- t1
 	x1 <- t2
 	y0 <- v1
@@ -71,11 +74,13 @@ for(i in seq(length(index(peek)))){
 	peekline[(x0+1):(x1-1)] = peekdiff[2:(x1-x0)]
 	peekright <- c()
 	tmp <- y1
-	for(i in x1:length(index(quotes))){
+	for(i in x1:length(index(quotes_raw))){
 		tmp <- y1 + (i-x1) * (y1 - y0) / (x1 -x0); 
 		peekright <- c(peekright, tmp)
 	}
-	peekline[x1:length(index(quotes))] <- peekright[1:length(peekright)]
+	peekline[x1:length(index(quotes_raw))] <- peekright[1:length(peekright)]
+	headind <- which(index(quotes_raw)== headdate)
+	peekline <- peekline[headind:length(index(quotes_raw))]
 	plines <- rbind(plines,peekline)
 }
 
@@ -88,13 +93,13 @@ for(i in seq(length(index(valley)))){
 	v2 = valley[i,4]
 	valleyres <- c()
 	valleyval <- c()
-	t1 <- which(index(quotes) == g1)[1] 
-	t2 <- which(index(quotes) == g2)[1] 
+	t1 <- which(index(quotes_raw) == g1)[1] 
+	t2 <- which(index(quotes_raw) == g2)[1] 
 	
 	if(is.na(t1) || is.na(t2)){
 		next
 	}
-	valleyline = rep(NA, length(index(quotes)))
+	valleyline = rep(NA, length(index(quotes_raw)))
 	x0 <- t1
 	x1 <- t2
 	y0 <- v1
@@ -105,15 +110,16 @@ for(i in seq(length(index(valley)))){
 	valleyline[(x0+1):(x1-1)] = valleydiff[2:(x1-x0)]
 	valleyright <- c()
 	tmp <- y1
-	for(i in x1:length(index(quotes))){
+	for(i in x1:length(index(quotes_raw))){
 		tmp <- y1 + (i-x1) * (y1 - y0) / (x1 -x0); 
 		valleyright <- c(valleyright, tmp)
 	}
-	valleyline[x1:length(index(quotes))] <- valleyright[1:length(valleyright)]
+	valleyline[x1:length(index(quotes_raw))] <- valleyright[1:length(valleyright)]
+	
+	headind <- which(index(quotes_raw)== headdate)
+	valleyline <- valleyline[headind:length(index(quotes_raw))]
 	vlines <- rbind(vlines, valleyline)
 }
-
-
 
 # 收集拐点
 res <- c()
@@ -161,8 +167,8 @@ gdPlot = function (x, n = 1, wilder = FALSE, ratio = NULL){
 }
 
 if(ticker=='ZS000001' || ticker=='ZS399006'){
-	colnames(quotes)[3] <- paste(ticker,".Close",sep="")
-	colnames(quotes)[4] <- paste(ticker,".Low",sep="")
+	# colnames(quotes_raw)[3] <- paste(ticker,".Close",sep="")
+	# colnames(quotes)[4] <- paste(ticker,".Low",sep="")
 	threshold <- 0.05
 }
 
@@ -182,7 +188,7 @@ for(i in seq(length(h))){
 	if (abs((nclose - h[i])/(h[i]+0.0000000001)) > threshold){
 		next
 	}
-	hline <- rep(h[i],length(index(quotes)))
+	hline <- rep(h[i],length(index(quotes_raw)))
 	hPlot = function (x, n = 1, wilder = FALSE, ratio = NULL)
 	{
 		ma <- .Call("ema", x, n, ratio, PACKAGE = "TTR")
@@ -228,7 +234,8 @@ for(j in seq(NROW(vlines))){
 }
 
 
-
 title(main="", cex.main=2.5, font.main=4, col.main="gold", 
 sub="", cex.sub=1.5, font.sub=4, col.sub="blue", 
 xlab="", ylab="",col.lab="blue", cex.lab=1)   
+
+dev.off()
