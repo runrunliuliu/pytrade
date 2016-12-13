@@ -206,6 +206,7 @@ class Merge(object):
         cnt     = 0
         header  = ''
         ft3dict = dict()
+        ftleng  = 0
         for line in open(self.__output + '/' + fname):
             if cnt == 0:
                 header = line.strip()[4:]
@@ -221,8 +222,9 @@ class Merge(object):
                     else:
                         fts.append(arr[i])
                 ft3dict[sday] = fts
+                ftleng = len(fts)
             cnt = cnt + 1
-        return(header, ft3dict)
+        return(header, ft3dict, ftleng)
 
     # Feature from LW
     def loadFT2(self, fname):
@@ -264,14 +266,14 @@ class Merge(object):
         # Get Header Index
         hd_index = dict()
         for line in open(path):
-            arr = line.strip().split('\t')
+            arr = line.strip().split(',')
             for i in range(0, len(arr)):
                 hd_index[i] = arr[i]
             break
         cnt  = 0
         headers = []
         for line in open(path):
-            arr = line.strip().split('\t')
+            arr = line.strip().split(',')
             fts = []
             for i in range(0, len(arr)):
                 if hd_index[i] not in self.__ft2hd_d:
@@ -280,6 +282,9 @@ class Merge(object):
                     headers.append(self.__ft2hd_d[arr[i]])
                 else:
                     if len(arr[i]) == 0:
+                        # special handling
+                        if i == len(arr) - 1:
+                            continue
                         arr[i] = '1024201'
                     else:
                         if hd_index[i].decode('utf8') == u'上证涨跌幅' and float(arr[i]) <= -0.01:
@@ -305,7 +310,7 @@ class Merge(object):
         self.transFT2('test2.txt')
 
         # (ft2header, ft2dict) = self.loadFT2(self.__inst + '.ft2.csv')
-        (ft2header, ft2dict) = self.loadFT3(self.__inst + '.ft3.csv')
+        (ft2header, ft2dict, ft2len) = self.loadFT3(self.__inst + '.ft3.csv')
 
         self.__header = 'day,' + self.__header + ',' + ft2header + ',ret1,ret2,ret3,ret4,ret5,ret6,ret7,ret8'
 
@@ -318,7 +323,7 @@ class Merge(object):
 
             # Get FT2
             ft2 = []
-            for i in range(0, 23):
+            for i in range(0, ft2len):
                 ft2.append('1024201')
             if k in ft2dict:
                 ft2 = ft2dict[k]
