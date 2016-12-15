@@ -103,17 +103,32 @@ def loadWeight(filename):
 def loadFtDict(path, code):
     fts    = []
     ftname = dict()
+    ftdesc = dict()
     for line in open(path + '/' + code + '.ft.dict'):
         arr = line.strip().split(',')
         ftname['f' + arr[0]] = arr[1]
         fts.append(arr[0])
-    return (fts, ftname)
+
+    for line in open('./conf/ft.dictname'):
+        arr = line.strip().split(',')
+        ftdesc[arr[0]] = arr[1]
+
+    return (fts, ftname, ftdesc)
 
 
 def featureImportance(path, code, bst):
-    (fts, ftname) = loadFtDict(path, code)
-    xgb.plot_importance(bst, importance_type="gain", ftname=ftname)
+    (fts, ftname, ftdesc) = loadFtDict(path, code)
+    (ax, tuples)  = xgb.plot_importance(bst, importance_type="gain", ftname=ftname)
     plt.savefig('importance.png')
+
+    f = open(path + '/' + code + '.ft.score.csv', 'w')
+    for i in range(1, len(tuples) + 1):
+        find  = tuples[-1 * i][0]
+        score = tuples[-1 * i][1]
+        fname = ftname[find]
+        fdesc = ftdesc[fname]
+        f.write(str(find) + ',' + fname + ',' + fdesc + ',' + str(score) + '\n')
+    f.close()
 
     # (fts, ftname) = loadFtDict(path, code)
     # ftscore = bst.get_score()
