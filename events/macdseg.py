@@ -35,6 +35,7 @@ class MacdSeg(eventprofiler.Predicate):
 
         self.__cxshort  = [] 
         self.__qcg      = [] 
+        self.__mhead    = [] 
         self.__observed = [] 
         self.__qushi    = []
         self.__dt       = []
@@ -54,6 +55,7 @@ class MacdSeg(eventprofiler.Predicate):
         self.__nbsignal       = OrderedDict()
         self.__qsline         = OrderedDict()
         self.__ctsignal       = OrderedDict()
+        self.__mhsignal       = OrderedDict()
 
         self.__qs = []
 
@@ -102,6 +104,9 @@ class MacdSeg(eventprofiler.Predicate):
 
     def getQCG(self):
         return self.__qcg
+
+    def getMHead(self):
+        return self.__mhead
 
     def getQUSHI(self):
         return self.__qushi
@@ -217,12 +222,12 @@ class MacdSeg(eventprofiler.Predicate):
     # ----------- NBS END -----------------------#
 
     # ----------- CITOU -----------------------#
-    def handleCT(self, dateTime, CT, inst, instname):
+    def handleXT(self, dateTime, XT, inst, instname):
         rets = None
-        score  = CT[1]
+        score  = XT[1]
         tprice = 'NULL' 
         gprice = 'NULL' 
-        key    = CT[0] 
+        key    = XT[0] 
         rets = (inst, instname, score, tprice, gprice, key)
         return rets
 
@@ -235,7 +240,7 @@ class MacdSeg(eventprofiler.Predicate):
         arr = []
         if dateTime in self.__ctsignal:
             arr = self.__ctsignal[dateTime]
-        tups = self.handleCT(dateTime, CT, inst, instname)
+        tups = self.handleXT(dateTime, CT, inst, instname)
         arr.append(tups)
         arr = sorted(arr, key=itemgetter(2), reverse=True)
         self.__ctsignal[dateTime] = arr 
@@ -243,10 +248,28 @@ class MacdSeg(eventprofiler.Predicate):
         return ret
     # ----------- CITOU END -----------------------#
 
+    # ----------- MHead ---------------------------#
+    def mhBuySignal(self, dateTime, inst, MHead):
+        ret = 0 
+        # 过滤掉空信号
+        if MHead is None:
+            return ret 
+        instname = self.__baseinfo.getName(inst) 
+        arr = []
+        if dateTime in self.__mhsignal:
+            arr = self.__mhsignal[dateTime]
+        tups = self.handleXT(dateTime, MHead, inst, instname)
+        arr.append(tups)
+        arr = sorted(arr, key=itemgetter(2), reverse=True)
+        self.__mhsignal[dateTime] = arr 
+        ret = 1
+        return ret
+    # ----------- MHead END -----------------------#
+
     def getTradeSignal(self):
         return (self.__trianglesignal, self.__qushisignal, \
                 self.__dtsignal, self.__nbsignal, \
-                self.__ctsignal)
+                self.__ctsignal, self.__mhsignal)
 
     def updateQSdiff(self, nbar, dateTime, dtzq):
         close = nbar.getClose()
@@ -303,6 +326,9 @@ class MacdSeg(eventprofiler.Predicate):
         QCG = self.__macd[instrument][-1][23]
         self.__qcg.append((dateTime, QCG))
 
+        MHead = self.__macd[instrument][-1][24]
+        self.__mhead.append((dateTime, MHead))
+
         self.__ftDes = self.__macd[instrument][-1][15]
         self.__ftInc = self.__macd[instrument][-1][16]
 
@@ -317,6 +343,7 @@ class MacdSeg(eventprofiler.Predicate):
         ret3 = self.dtBuySignal(dateTime, instrument, dt)
         ret4 = self.nbsBuySignal(dateTime, instrument, NBS)
         ret5 = self.ctBuySignal(dateTime, instrument, CT)
+        ret6 = self.mhBuySignal(dateTime, instrument, MHead)
 
         # print 'DEBUG', dateTime, self.__dtsignal
 
@@ -325,7 +352,9 @@ class MacdSeg(eventprofiler.Predicate):
         self.__roc[instrument] = instroc
 
         if vbeili == 1:
-            print "EVENT OK", dateTime, instrument, ret1, ret2, ret3, ret4, ret5
+            print "EVENT OK", dateTime, instrument, \
+                ret1, ret2, ret3, \
+                ret4, ret5, ret6
             ret = True
         return ret
 #
