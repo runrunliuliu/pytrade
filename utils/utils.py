@@ -166,6 +166,9 @@ class DumpFeature(object):
         # K-LINE策略 
         self.TradeSignal2csv('kline', 4, 'trade')
 
+        # MHead策略 
+        self.TradeSignal2csv('mhead', 5, 'trade')
+
     def QCG2csv(self, subdir):
         dirs = self.__dir + '/' + subdir 
         if not os.path.exists(dirs):
@@ -191,7 +194,7 @@ class DumpFeature(object):
                 '10xingtai,11vret,12vscore,13nvpos,14pret,15pscore,16nppos,17slope,'  + \
                 '18dma250,19pma250,20prext,21tkdk,22tkdf,23ma20GD,24lfbl,25lfblhi,26lfblcl,27qsell,' + \
                 '28md5120,29tfbl,30fibs,31bias5120,32fbprice,33fbpress,34bddf,35goldseg,' + \
-                '36ma5d,37peekzl,38mhead\n')
+                '36ma5d,37peekzl\n')
         for cx in self.__cxshort:
             k = cx[0]
             v = cx[1]
