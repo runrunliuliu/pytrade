@@ -23,6 +23,7 @@ from pyalgotrade import bar
 from pyalgotrade import marketsession
 import datetime
 from utils import utils
+from mock import folio 
 from events import macdseg 
 from pyalgotrade import eventprofiler
 from pyalgotrade.utils import instinfo 
@@ -162,6 +163,9 @@ def main(argv):
 
     if mode == 'full' or mode == 'mock':
         strat   = None
+        pf = folio.folio(startday, baseday)
+        pf.tearsheet()
+        exit()
         if trade == 'triangle':
             forcetp = 7
             strat = triangle(startday, baseday, codearr, dirs, forcetp)
@@ -171,8 +175,8 @@ def main(argv):
         if trade == 'kline':
             forcetp = 11 
             strat = KLINE(startday, baseday, codearr, dirs, forcetp)
-        ft = utils.FakeTrade(codearr, dirs, startday, baseday, strat, forcetp)
-        ft.mock()
+        # ft = utils.FakeTrade(codearr, dirs, startday, baseday, strat, forcetp)
+        # ft.mock()
 
     if mode == 'stock':
         subdir  = ''
