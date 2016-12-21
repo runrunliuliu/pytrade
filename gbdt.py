@@ -86,7 +86,11 @@ def train(path, code):
     yprob  = bst.predict(xg_test)
     ylabel = np.argmax(yprob, axis=1)
 
-    PredictDebug(path, code, bst, predict_threshold)
+    test_debug = path + '/' + code + '.test.csv.debug'
+    xg_testd   = xgb.DMatrix(test_debug)
+    yprob_d    = bst.predict(xg_testd)
+    test_Y_d   = xg_testd.get_label()
+    PredictDebug(path, code, yprob_d, test_Y_d, predict_threshold)
    
     print confusion_matrix(test_Y, ylabel)
 
@@ -105,7 +109,7 @@ def train(path, code):
     bst.save_model('output/models/' + code + '.model')
 
 
-def PredictDebug(odir, code, bst, threshold):
+def PredictDebug(odir, code, yprob, test_Y, threshold):
     key_value = loadtxt(odir + '/' + code + '.actday.csv', delimiter=",")
     actdays   = { int(k):float(v) for k,v in key_value }
 
@@ -115,12 +119,8 @@ def PredictDebug(odir, code, bst, threshold):
     dictdays  = { v[0]:v[1] for v in zip(indexdays, range(0, len(indexdays))) }
 
     test_pred  = open(odir + '/' + code + '.test.pred.csv', 'w')
-    test_debug = odir + '/' + code + '.test.csv.debug'
 
-    xg_testd = xgb.DMatrix(test_debug)
-    yprob  = bst.predict(xg_testd)
     ylabel = np.argmax(yprob, axis=1)
-    test_Y = xg_testd.get_label()
 
     nylabel = []
     ntest_Y = []
@@ -128,7 +128,6 @@ def PredictDebug(odir, code, bst, threshold):
     bd_Y       = [] 
     match_pred = [] 
 
-    test_pred.write('day,true,predict,npredict\n')
     for i in range(0, len(yprob)):
         tmp     = str(int(test_Y[i]))
         index   = tmp[0:-1]
@@ -143,8 +142,9 @@ def PredictDebug(odir, code, bst, threshold):
         if yprob[i][0] < threshold and yprob[i][1] < 0.5:
             nplabel = 2
 
-        if test_day < 20160301:
-            print 'DEBUG_Predict: ignore:', tmp, index, test_day
+        tmatch = -1 
+        if test_day < 20060301:
+            print >> sys.stderr, 'DEBUG_Predict: ignore:', tmp, index, test_day
         else:
             if test_day in actdays:
                 bd_Y.append(test_day)
@@ -152,8 +152,15 @@ def PredictDebug(odir, code, bst, threshold):
                 tmatch = mutils.forwardCheck(dictdays[test_day], indexdays, actdays)
                 if tmatch is not None:
                     match_pred.append((test_day, tmatch))
+                # for show
+                if tmatch is None:
+                    tmatch = 'NULL'
+                else:
+                    tmatch = str(tmatch[0][0]) + '-' + str(tmatch[0][1])
 
-        test_pred.write(str(test_day) + ',' + str(label) + ',' + str(plabel) + ',' + str(nplabel))
+        prob = yprob[i][plabel]
+        test_pred.write(str(test_day) + ',' + str(label) + ',' + \
+                        str(plabel) + ',' + str(prob) + ',' + str(nplabel) + ',' + str(tmatch))
         
         test_pred.write('\n')
 
@@ -164,27 +171,38 @@ def PredictDebug(odir, code, bst, threshold):
     ddays = set()
     for m in match_pred:
         for k in m[1]:
-            print m[0], k[0], k[1]
+            print >> sys.stderr, m[0], k[0], k[1]
             ddays.add(k[0])
     miss_bd = 0
     for bd in bd_Y:
         if bd not in ddays:
-            print 'MISS:', bd
+            print >> sys.stderr, 'MISS:', bd
             miss_bd = miss_bd + 1
-    print 'MISS_RATE:', miss_bd / (len(ddays) + 0.0)
 
-    print confusion_matrix(nylabel, ntest_Y)
-    print classification_report(nylabel, ntest_Y)
+    cm = confusion_matrix(nylabel, ntest_Y)
+
+    test_sum  = open(odir + '/' + code + '.test.sum.csv', 'w')
+    tp = cm[0][0] / (cm[0][0] +  cm[1][0] + cm[2][0] + 0.0)
+    zh = cm[0][0] / (cm[0][0] +  cm[0][1] + cm[0][2] + 0.0)
+    ms = 1.0 - miss_bd / (len(ddays) + 0.0)
+
+    tp = "{:.2f}".format(tp)
+    zh = "{:.2f}".format(zh)
+    ms = "{:.2f}".format(ms)
+    test_sum.write(str(test_day) + ',' + tp + ',' + zh + ',' + ms)
+    test_sum.write('\n')
+
+    print >> sys.stderr, classification_report(nylabel, ntest_Y)
 
 
 def predict(path, code):
     key_value = loadtxt(path + '/' + code + '.test.csv.index', delimiter=",")
     test_ind  = { int(k):int(v) for k,v in key_value }
 
-    test_debug = path + '/' + code + '.test.csv.debug'
-    xg_testd = xgb.DMatrix(test_debug)
     bst = xgb.Booster({'nthread':4})
     bst.load_model("output/models/" + code + '.model')
+    test_debug = path + '/' + code + '.test.csv.debug'
+    xg_testd   = xgb.DMatrix(test_debug)
     yprob  = bst.predict(xg_testd)
     ylabel = np.argmax(yprob, axis=1)
     test_Y = xg_testd.get_label()
@@ -194,6 +212,8 @@ def predict(path, code):
         test_day = test_ind[int(tmp)] 
         plabel  = ylabel[i]
         print test_day, plabel, yprob[i][plabel]
+
+    PredictDebug(path, code, yprob, test_Y, 0.5)
 
 
 # Main
