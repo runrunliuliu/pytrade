@@ -13,7 +13,11 @@ class folio(object):
 
         szzs = self.initRets('./data/dayk/ZS000001.csv', 'SZZS', 'Close')
         szzs = szzs[(szzs.index >= start) & (szzs.index <= end)]
-        self.__szzs = szzs.T.iloc[0]
+
+        hs300 = self.initRets('./data/dayk/ZS000300.csv', 'HS300', 'Close')
+        hs300 = hs300[(hs300.index >= start) & (hs300.index <= end)]
+
+        self.__base = hs300.T.iloc[0]
 
     def initRets(self, fname, symbol, attr):
         df = pd.read_csv(fname, index_col=0)
@@ -27,7 +31,7 @@ class folio(object):
         return rets
 
     def tearsheet(self):
-        pp  = PdfPages('multipage.pdf')
-        fig = pf.create_returns_tear_sheet(self.__strategy, benchmark_rets=self.__szzs, return_fig=True)
+        pp  = PdfPages('./backtests/multipage.pdf')
+        fig = pf.create_returns_tear_sheet(self.__strategy, benchmark_rets=self.__base, return_fig=True)
         fig.savefig(pp, format='pdf')
         pp.close()
