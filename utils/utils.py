@@ -25,6 +25,11 @@ class TimeUtils(object):
         date2 = self.string_toDatetime(dateStr2)
         return date1.date() > date2.date()
 
+    def comparedt(self,dateStr1,dateStr2, formats):
+        date1 = datetime.datetime.strptime(dateStr1, formats)
+        date2 = datetime.datetime.strptime(dateStr2, formats)
+        return date1.date() < date2.date()
+
     """把字符串转成时间戳形式"""
     def string_toTimestamp(self,strTime):
         return time.mktime(self.string_toDatetime(strTime).timetuple())
