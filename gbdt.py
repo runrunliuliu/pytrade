@@ -5,6 +5,7 @@ import re
 from ml.merge import Merge 
 from ml.fteng import FTeng 
 import ml.utils as mutils
+from utils import utils
 import xgboost as xgb
 import numpy as np
 from sklearn.metrics import confusion_matrix 
@@ -234,8 +235,9 @@ def main(plot, argv):
     code = 'ZS000001'
     odir = './output/fts'
 
+    ts = utils.TimeUtils()
     # Load Data
-    mg = Merge(code, './data/', odir)
+    mg = Merge(code, './data/', odir, ts)
     mg.combFeatures()
 
     # Feature Engineering
