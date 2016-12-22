@@ -174,6 +174,8 @@ class FTeng(object):
                 # if ft[0] in {44,47,45,17}:
                 if ft[0] in {}:
                     continue
+                if len(ft[1]) == 0:
+                    continue
                 out = out + ' ' + str(ft[0]) + ':' + ft[1] 
             
             d.write(item[0] + ',' + str(debug) + out + '\n')
