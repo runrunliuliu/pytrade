@@ -163,9 +163,6 @@ def main(argv):
 
     if mode == 'full' or mode == 'mock':
         strat   = None
-        pf = folio.folio(startday, baseday)
-        pf.tearsheet()
-        exit()
         if trade == 'triangle':
             forcetp = 7
             strat = triangle(startday, baseday, codearr, dirs, forcetp)
@@ -175,8 +172,10 @@ def main(argv):
         if trade == 'kline':
             forcetp = 11 
             strat = KLINE(startday, baseday, codearr, dirs, forcetp)
-        # ft = utils.FakeTrade(codearr, dirs, startday, baseday, strat, forcetp)
-        # ft.mock()
+        ft = utils.FakeTrade(codearr, dirs, startday, baseday, strat, forcetp)
+        ft.mock()
+        pf = folio.folio(startday, baseday)
+        pf.tearsheet()
 
     if mode == 'stock':
         subdir  = ''
