@@ -6,7 +6,9 @@ import re
 
 class Merge(object):
 
-    def __init__(self, inst, base, output):
+    def __init__(self, inst, base, output, ts):
+
+        self.__ts = ts 
         self.__basedir = base
         self.__header  = ''
 
@@ -281,6 +283,12 @@ class Merge(object):
                 if cnt == 0:
                     headers.append(self.__ft2hd_d[arr[i]])
                 else:
+                    desname = self.__ft2hd_d[hd_index[i]]
+
+                    # special handling 急涨急跌
+                    if desname == 'jjdmin' and self.__ts.comparedt(arr[0], '20160301', '%Y%m%d'):
+                        arr[i] = ''
+
                     if len(arr[i]) == 0:
                         # special handling
                         if i == len(arr) - 1:
