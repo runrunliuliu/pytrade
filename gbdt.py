@@ -64,7 +64,7 @@ def train(path, code):
     # use softmax multi-class classification
     # scale weight of positive examples
     param['eta']               = 0.10
-    num_round                  = 100
+    num_round                  = 150
     param['subsample']         = 1.0
     param['colsample_bytree']  = 0.7 
     param['colsample_bylevel'] = 0.8 
