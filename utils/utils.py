@@ -1169,12 +1169,16 @@ class FakeTrade(object):
         return (curholds, curuseage, len(tdetail)) 
 
     def printSwitch(self, nday): 
+
+        ftrans = open(self.__btdir + '/' + self.__prefix + '.trans.csv', 'w')
+        ftrans.write('index,amount,price,symbol\n')
+        trans = []
+
         zuhe = PrettyTable([u'T日', u'卖出日', u'代码', u'名称', u'收益率', u'持有天数', u'开仓价', u'止盈价', u'止损价', u'手数'])
         zuhe.float_format = '.4'
         zuhe.align = 'l'
         total = 0
         win   = 0.0
-
         avgholds  = 0.0
 
         for s in self.__switch:
@@ -1194,6 +1198,21 @@ class FakeTrade(object):
             zuhe.add_row(tmp)
             total = total + 1
             avgholds = avgholds + holds
+
+            trans.append((s[0][0],str(100 * (s[5] / 100)),s[1],s[0][1][0], 1))
+            trans.append((s[4],'-' + str(100 * (s[5] / 100)),s[2],s[0][1][0], -1))
+
+        trans = sorted(trans,key=itemgetter(0))
+        for t in trans:
+            tmp_nxday = t[0]
+            if t[4] == 1:
+                if t[0] == self.__edate.strftime('%Y-%m-%d'):
+                    print 'DEBUG', t[0], t[1], ' is discard'
+                    continue
+                (tmp_yday, tmp_nxday) = self.getDays(t[3], t[0])
+            ftrans.write(tmp_nxday + ','  + t[1] + ',' + str(t[2]) + ',' + t[3])
+            ftrans.write('\n')
+        ftrans.close()
 
         output = zuhe.get_string().encode('utf-8') 
         
