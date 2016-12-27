@@ -283,11 +283,10 @@ class Merge(object):
                 if cnt == 0:
                     headers.append(self.__ft2hd_d[arr[i]])
                 else:
-                    desname = self.__ft2hd_d[hd_index[i]]
-
                     # special handling 急涨急跌
-                    if desname == 'jjdmin' and self.__ts.comparedt(arr[0], '20160301', '%Y%m%d'):
-                        arr[i] = ''
+                    # desname = self.__ft2hd_d[hd_index[i]]
+                    # if desname == 'jjdmin' and self.__ts.comparedt(arr[0], '20160301', '%Y%m%d'):
+                    #     arr[i] = ''
 
                     if len(arr[i]) == 0:
                         # special handling
