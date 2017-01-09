@@ -41,6 +41,7 @@ class MacdSeg(eventprofiler.Predicate):
         self.__dt       = []
         self.__nbs      = []
         self.__ct       = []
+        self.__xingtai  = [] 
 
         self.__ftDes = None
         self.__ftInc = None
@@ -101,6 +102,9 @@ class MacdSeg(eventprofiler.Predicate):
 
     def getCXshort(self):
         return self.__cxshort
+
+    def getXINGTAI(self):
+        return self.__xingtai
 
     def getQCG(self):
         return self.__qcg
@@ -328,6 +332,9 @@ class MacdSeg(eventprofiler.Predicate):
 
         MHead = self.__macd[instrument][-1][24]
         self.__mhead.append((dateTime, MHead))
+
+        XINGTAI = self.__macd[instrument][-1][25]
+        self.__xingtai.append((dateTime, XINGTAI))
 
         self.__ftDes = self.__macd[instrument][-1][15]
         self.__ftInc = self.__macd[instrument][-1][16]
