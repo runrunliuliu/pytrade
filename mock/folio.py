@@ -3,6 +3,7 @@ import pandas as pd
 import datetime
 import empyrical
 from matplotlib.backends.backend_pdf import PdfPages
+from pyfolio import round_trips
 
 
 class folio(object):
@@ -19,6 +20,8 @@ class folio(object):
 
         self.__base = hs300.T.iloc[0]
 
+        self.__trans = self.initTrans('./backtests/20060104_20160104.trans.csv')
+
     def initRets(self, fname, symbol, attr):
         df = pd.read_csv(fname, index_col=0)
         df.index = pd.to_datetime(df.index)
@@ -29,6 +32,18 @@ class folio(object):
         rets.columns = [symbol]
 
         return rets
+
+    def initTrans(self, fname):
+        df = pd.read_csv(fname)
+        df.open_dt  = pd.to_datetime(df.open_dt)
+        df.close_dt = pd.to_datetime(df.close_dt)
+        return df
+
+    def tearTrans(self):
+        pp  = PdfPages('./backtests/transpage.pdf')
+        fig = pf.create_transactions_tear_sheet(self.__trans, return_fig=True)
+        fig.savefig(pp, format='pdf')
+        pp.close()
 
     def tearsheet(self):
         pp  = PdfPages('./backtests/multipage.pdf')
