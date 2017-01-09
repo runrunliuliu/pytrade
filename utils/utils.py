@@ -2,6 +2,7 @@
 import sys
 import os
 import math
+import json
 import time
 import datetime
 import numpy as np
@@ -129,6 +130,7 @@ class DumpFeature(object):
 
         self.__cxshort = obj.getCXshort()
         self.__qcg     = obj.getQCG()
+        self.__xingtai = obj.getXINGTAI()
         
         self.__qushi = obj.getQUSHI()
         self.__dt    = obj.getDT()
@@ -158,7 +160,8 @@ class DumpFeature(object):
         self.Ob2csv('triangle', 0, 'ob')
         self.CX2csv('mtime')
         self.QCG2csv('qcg')
-       
+        self.XT2csv('xingtai')
+
         # 趋势线策略 
         self.TradeSignal2csv('qushi', 1, 'trade')
         
@@ -189,6 +192,21 @@ class DumpFeature(object):
                     out = out + ',' + str(t)
                 f.write(item[0].strftime('%Y-%m-%d') + out)
                 f.write('\n')
+
+    def XT2csv(self, subdir):
+        dirs = self.__dir + '/' + subdir
+        if not os.path.exists(dirs):
+            os.makedirs(dirs)
+        f = open(dirs + '/' + self.__inst[0][1] + '.xingtai.csv', 'w')
+        for cx in self.__xingtai:
+            k = cx[0]
+            v = cx[1]
+            if v is None:
+                continue
+            out = json.dumps(v)
+            f.write(k.strftime('%Y-%m-%d') + '\t' +  out)
+            f.write('\n')
+        f.close()
 
     def CX2csv(self, subdir):
         dirs = self.__dir + '/' + subdir 
@@ -391,6 +409,11 @@ class FakeTrade(object):
         self.__prefix = self.__sdate.strftime('%Y%m%d') + '_' + self.__edate.strftime('%Y%m%d')
 
         self.tradedays(dirs)
+
+        self.__codemap = dict()
+        self.__codearr = []
+
+        num = 0
         for c in codearr:
             tmp   = c.split('-')
             fname = tmp[-1]
@@ -400,6 +423,10 @@ class FakeTrade(object):
             code  = fname[0:8]
             fname = dirs + '/' + code + '.csv'
             self.loadDayK(fname, code)
+            
+            self.__codearr.append(code)
+            self.__codemap[code] = num
+            num = num + 1
 
         self.__trade = trade
         self.__trade.initDayK(self.__opset, self.__hiset, self.__lwset, self.__clset, self.__lastdayk)
@@ -1171,8 +1198,7 @@ class FakeTrade(object):
     def printSwitch(self, nday): 
 
         ftrans = open(self.__btdir + '/' + self.__prefix + '.trans.csv', 'w')
-        ftrans.write('index,amount,price,symbol\n')
-        trans = []
+        ftrans.write('close_dt,long,open_dt,pnl,returns,symbol,duration\n')
 
         zuhe = PrettyTable([u'T日', u'卖出日', u'代码', u'名称', u'收益率', u'持有天数', u'开仓价', u'止盈价', u'止损价', u'手数'])
         zuhe.float_format = '.4'
@@ -1199,18 +1225,9 @@ class FakeTrade(object):
             total = total + 1
             avgholds = avgholds + holds
 
-            trans.append((s[0][0],str(100 * (s[5] / 100)),s[1],s[0][1][0], 1))
-            trans.append((s[4],'-' + str(100 * (s[5] / 100)),s[2],s[0][1][0], -1))
-
-        trans = sorted(trans,key=itemgetter(0))
-        for t in trans:
-            tmp_nxday = t[0]
-            if t[4] == 1:
-                if t[0] == self.__edate.strftime('%Y-%m-%d'):
-                    print 'DEBUG', t[0], t[1], ' is discard'
-                    continue
-                (tmp_yday, tmp_nxday) = self.getDays(t[3], t[0])
-            ftrans.write(tmp_nxday + ','  + t[1] + ',' + str(t[2]) + ',' + t[3])
+            pnl = (float(s[2]) - float(s[1])) * 100 * (s[5] / 100)
+            t_trans = (s[4], 'True', s[0][0], str(pnl), str(roc / 100), s[0][1][0], str(holds))
+            ftrans.write(','.join(t_trans))
             ftrans.write('\n')
         ftrans.close()
 
