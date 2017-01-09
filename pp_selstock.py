@@ -176,6 +176,7 @@ def main(argv):
         ft.mock()
         pf = folio.folio(startday, baseday)
         pf.tearsheet()
+        pf.tearTrans()
 
     if mode == 'stock':
         subdir  = ''
