@@ -355,7 +355,7 @@ class FakeTrade(object):
         self.__bearstopwin = 1.05
         self.__bearstoplos = 0.92
         self.__numzuhe     = 8 
-        self.__maxbuy      = 2 
+        self.__maxbuy      = 2
 
         if trade.getName() == 'nbs':
             self.__stopwin     = 1.05
