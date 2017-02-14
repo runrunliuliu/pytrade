@@ -1257,6 +1257,13 @@ class FakeTrade(object):
 
 def parseinst(codearr, bk='ALL'):
     out = []
+
+    d = set()
+    if bk == 'DEBUG':
+        for line in open('./data/dayk/debug.csv'):
+            code = line.strip()
+            d.add(code)
+
     for c in codearr:
         tmp   = c.split('-')
         fname = tmp[-1]
@@ -1276,6 +1283,8 @@ def parseinst(codearr, bk='ALL'):
         if bk == 'ALL':
             out.append((fname,code))
         if bk == 'BK' and f1 == 'BK':
+            out.append((fname,code))
+        if bk == 'DEBUG' and code in d:
             out.append((fname,code))
     return out
 
