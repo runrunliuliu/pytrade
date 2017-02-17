@@ -124,6 +124,12 @@ def main(argv):
     if period == 'month':
         dirs = './data/monk/'
         freq = bar.Frequency.MONTH
+    if period == '30min':
+        dirs = './data/30mink/'
+        freq = bar.Frequency.MIN30
+    if period == '60min':
+        dirs = './data/60mink/'
+        freq = bar.Frequency.MIN60
 
     # LOG CONFIGURE
     q = Queue()
