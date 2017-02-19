@@ -99,6 +99,9 @@ def main(plot, argv):
     if period == '30min':
         dirpath = './data/30mink/'
         freq = bar.Frequency.MIN30
+    if period == '60min':
+        dirpath = './data/60mink/'
+        freq = bar.Frequency.MIN60
 
     fs = FileUtils('','','')
     codearr = fs.os_walk(dirpath)
@@ -115,25 +118,27 @@ def main(plot, argv):
     # instfiles = [("SZ002208.csv","SZ002208")]
     # instfiles = [("SZ300346.csv","SZ300346")]
     # instfiles = [("SZ300358.csv","SZ300358")]
-    # instfiles = [("SZ002248.csv","SZ002248")]
+    # instfiles = [("SZ002361.csv","SZ002361")]
+    # instfiles = [("SZ002566.csv","SZ002566")]
     # instfiles = [("SH600436.csv","SH600436")]
-    # instfiles = [("SH601801.csv","SH601801")]
+    # instfiles = [("SH603618.csv","SH603618")]
     # instfiles = [("SH603558.csv","SH603558")]
-    # instfiles = [("SH600395.csv","SH600395")]
+    # instfiles = [("SH600615.csv","SH600615")]
     # instfiles = [("SH600256.csv","SH600256")]
     # instfiles = [("SH603800.csv","SH603800")]
-    # instfiles = [("SH600900.csv","SH600900")]
-    # instfiles = [("SH601668.csv","SH601668")]
-    # instfiles = [("SH600202.csv","SH600202")]
-    # instfiles = [("SZ300136.csv","SZ300136")]
-    # instfiles = [("SZ002195.csv","SZ002195")]
-    # instfiles = [("SZ002092.csv","SZ002092")]
+    # instfiles = [("SH600787.csv","SH600787")]
+    # instfiles = [("SH603618.csv","SH603618")]
+    # instfiles = [("SZ002018.csv","SZ002018")]
+    # instfiles = [("SZ000488.csv","SZ000488")]
+    # instfiles = [("SH600992.csv","SH600992")]
+    # instfiles = [("SH600219.csv","SH600219")]
+    # instfiles = [("SZ300124.csv","SZ300124")]
+    instfiles = [("SZ000001.csv","SZ000001")]
     # instfiles = [("SZ300287.csv","SZ300287")]
     # instfiles = [("SZ300221.csv","SZ300221")]
-    # instfiles = [("SZ002517.csv","SZ002517")]
     # instfiles = [("BK300041.csv","BK300041")]
     # instfiles = [("SH600052.csv","SH600052")]
-    instfiles = [("ZS000001.csv","ZS000001")]
+    # instfiles = [("ZS000016.csv","ZS000016")]
     # instfiles = [("ZS399006.csv","ZS399006")]
     insts  = [] 
 
@@ -162,7 +167,7 @@ def main(plot, argv):
     eventProfiler = eventprofiler.Profiler(predicate, 1, 1)
     eventProfiler.run(feed, 2, True)
 
-    dump = utils.DumpFeature(predicate, instfiles, dirpath) 
+    dump = utils.DumpFeature(predicate, instfiles, dirpath, period)
     dump.ToDump()
    
     q.put(None)
