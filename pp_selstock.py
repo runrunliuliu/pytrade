@@ -48,7 +48,7 @@ def logger_thread(q):
         logger.handle(record)
 
 
-def runstrategy(index,fncodearr,div, dirpath, freq, q):
+def runstrategy(index,fncodearr,div, dirpath, freq, q, period):
 
     start = div[index][0]
     end   = div[index][1]
@@ -81,7 +81,7 @@ def runstrategy(index,fncodearr,div, dirpath, freq, q):
         eventProfiler = eventprofiler.Profiler(predicate, 1, 1)
         eventProfiler.run(feed, 2, True)
 
-        dump = utils.DumpFeature(predicate, instfiles, dirpath)
+        dump = utils.DumpFeature(predicate, instfiles, dirpath, period)
         dump.ToDump()
 
 
@@ -151,7 +151,7 @@ def main(argv):
         div[cores - 1] = (div[cores - 1][0],end)
 
         # Setup a list of processes that we want to run
-        processes = [mp.Process(target=runstrategy, args=(x,fncodearr,div, dirs, freq, q)) for x in range(cores)]
+        processes = [mp.Process(target=runstrategy, args=(x,fncodearr,div, dirs, freq, q, period)) for x in range(cores)]
         
         # Run processes
         for p in processes:
