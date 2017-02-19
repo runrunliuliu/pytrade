@@ -112,9 +112,10 @@ class FileUtils(object):
 
 class DumpFeature(object):
 
-    def __init__(self, obj, instfiles, dirpath):
+    def __init__(self, obj, instfiles, dirpath, period):
         self.__inst   = instfiles
         self.__dir    = dirpath
+        self.__period = period
 
         self.__gd = obj.getGD()
         self.__hl = obj.getHL()
@@ -204,7 +205,12 @@ class DumpFeature(object):
             if v is None:
                 continue
             out = json.dumps(v)
-            f.write(k.strftime('%Y-%m-%d') + '\t' +  out)
+            dd  = k.strftime('%Y-%m-%d')
+            if self.__period == '30min':
+                dd  = k.strftime('%Y-%m-%d-%H-%M')
+            if self.__period == '60min':
+                dd  = k.strftime('%Y-%m-%d-%H-%M')
+            f.write(dd + '\t' +  out)
             f.write('\n')
         f.close()
 
