@@ -1266,7 +1266,7 @@ def parseinst(codearr, bk='ALL'):
 
     d = set()
     if bk == 'DEBUG':
-        for line in open('./data/dayk/debug.csv'):
+        for line in open('./data/debug.csv'):
             code = line.strip()
             d.add(code)
 
