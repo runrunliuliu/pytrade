@@ -47,7 +47,7 @@ def TransFormat(index, fncodearr, div, dirs):
                 day  = dt.strftime('%Y-%m-%d-%H-%M')
             if period == '60':
                 odir = '60mink'
-                day  = dt.strftime('%Y-%m-%d-%H')
+                day  = dt.strftime('%Y-%m-%d-%H-%M')
             nline = (day, tmp[1], tmp[2], tmp[3], tmp[4], tmp[5], tmp[4])
             output.append(nline)
             cnt = cnt + 1 
