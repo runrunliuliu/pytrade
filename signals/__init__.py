@@ -28,6 +28,11 @@ class XTsignal(object):
             code  = fname[0:8]
             self.__codes.append(code)
 
+        self.__codename = dict()
+        for line in open(dirs + '/stockinfo.csv'):
+            arr = line.strip().split(',')
+            self.__codename[arr[1]] = arr[2]
+
     # load Data
     def loadJSON(self, period):
         ret = dict()
@@ -35,7 +40,7 @@ class XTsignal(object):
             fname = self.__dirs + '/' + period + \
                 '/xingtai/'  + c + '.xingtai.csv'
             if os.path.isfile(fname) is False:
-                return ret
+                continue
             for line in open(fname):
                 line = line.strip()
                 arr  = line.split('\t')
@@ -48,11 +53,20 @@ class XTsignal(object):
         self.__nmonk  = self.loadJSON('monk')
         self.__nweek  = self.loadJSON('week')
         self.__ndayk  = self.loadJSON('dayk')
+        self.__n60min = self.loadJSON('60mink')
         self.__n30min = self.loadJSON('30mink')
 
     def getSignals(self):
-        return (self.__nmonk, self.__nweek, self.__ndayk, self.__n30min)
+        return (self.__nmonk, self.__nweek, self.__ndayk, \
+                self.__n60min, self.__n30min)
 
     def getCodes(self):
         return self.__codes
+
+    def getName(self, code):
+        ret  = 'NULL'
+        code = code[2:]
+        if code in self.__codename:
+            ret = self.__codename[code]
+        return ret
 #
