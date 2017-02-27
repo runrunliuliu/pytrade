@@ -162,6 +162,7 @@ class DumpFeature(object):
         self.CX2csv('mtime')
         self.QCG2csv('qcg')
         self.XT2csv('xingtai')
+        self.redisXT2csv('xingtai')
 
         # 趋势线策略 
         self.TradeSignal2csv('qushi', 1, 'trade')
@@ -211,6 +212,27 @@ class DumpFeature(object):
             if self.__period == '60min':
                 dd  = k.strftime('%Y-%m-%d-%H-%M')
             f.write(dd + '\t' +  out)
+            f.write('\n')
+        f.close()
+
+    # Dump AS redis format
+    def redisXT2csv(self, subdir):
+        dirs = 'output/redis/' + self.__dir + '/' + subdir
+        if not os.path.exists(dirs):
+            os.makedirs(dirs)
+        f = open(dirs + '/' + self.__inst[0][1] + '.xingtai.csv', 'w')
+        for cx in self.__xingtai:
+            k = cx[0]
+            v = cx[1]
+            if v is None:
+                continue
+            out = json.dumps(v)
+            dd  = k.strftime('%Y-%m-%d')
+            if self.__period == '30min':
+                dd  = k.strftime('%Y-%m-%d-%H-%M')
+            if self.__period == '60min':
+                dd  = k.strftime('%Y-%m-%d-%H-%M')
+            f.write(self.__inst[0][1] + '_' + dd + '\t' +  out)
             f.write('\n')
         f.close()
 
