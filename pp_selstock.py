@@ -62,7 +62,7 @@ def runstrategy(index,fncodearr,div, dirpath, freq, q, period):
         toMonth   = 2
         toDay     = 24
         start_time = datetime.datetime(1990,fromMonth,fromDay,00,00)
-        end_time   = datetime.datetime(2017,toMonth,toDay,00,00)
+        end_time   = datetime.datetime(2020,toMonth,toDay,00,00)
         barFilter  = csvfeed.CHINAEquitiesRTH(start_time,end_time)
 
         baseinfo = instinfo.InstrumentInfo('data/stockinfo.csv')

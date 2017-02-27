@@ -81,7 +81,7 @@ def main(plot, argv):
     toMonth   = 2
     toDay     = 24
     start_time = datetime.datetime(2001,fromMonth,fromDay,00,00)
-    end_time   = datetime.datetime(2017,toMonth,toDay,00,00)
+    end_time   = datetime.datetime(2020,toMonth,toDay,00,00)
     barFilter  = csvfeed.CHINAEquitiesRTH(start_time,end_time)
     baseinfo = instinfo.InstrumentInfo('data/stockinfo.csv')
 
@@ -130,12 +130,11 @@ def main(plot, argv):
     # instfiles = [("SH603618.csv","SH603618")]
     # instfiles = [("SZ002018.csv","SZ002018")]
     # instfiles = [("SZ000488.csv","SZ000488")]
-    # instfiles = [("SH600992.csv","SH600992")]
+    # instfiles = [("SH600050.csv","SH600050")]
     # instfiles = [("SH600219.csv","SH600219")]
     # instfiles = [("SZ300124.csv","SZ300124")]
-    instfiles = [("SZ000001.csv","SZ000001")]
-    # instfiles = [("SZ300287.csv","SZ300287")]
-    # instfiles = [("SZ300221.csv","SZ300221")]
+    # instfiles = [("SZ000001.csv","SZ000001")]
+    instfiles = [("SZ002397.csv","SZ002397")]
     # instfiles = [("BK300041.csv","BK300041")]
     # instfiles = [("SH600052.csv","SH600052")]
     # instfiles = [("ZS000016.csv","ZS000016")]
