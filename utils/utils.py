@@ -10,6 +10,7 @@ from collections import OrderedDict
 from operator import itemgetter
 from prettytable import PrettyTable
 from mock.triangle import triangle 
+from random import shuffle
 
 
 class TimeUtils(object):
@@ -1322,6 +1323,7 @@ def parseinst(codearr, bk='ALL'):
             out.append((fname,code))
         if bk == 'DEBUG' and code in d:
             out.append((fname,code))
+    shuffle(out)
     return out
 
 
