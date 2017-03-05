@@ -2,6 +2,7 @@
 import sys
 import getopt
 from signals.multiperiod import MultiPeriod 
+from signals.szl import SZL
 
 
 def main(argv):
@@ -19,8 +20,16 @@ def main(argv):
             nday = arg
     dirs = './data/'
 
+    output = './output/select/xt/mp/'
     sel = MultiPeriod(dirs, nday)
-    sel.select()
+    sel.select(output)
+
+    output = './output/xt/mp/'
+    sel.dumpFT(output)
+
+    output = './output/select/xt/szl/'
+    sel = SZL(dirs, nday)
+    sel.select(output)
 
 if __name__ == "__main__":
     main(sys.argv[1:])
