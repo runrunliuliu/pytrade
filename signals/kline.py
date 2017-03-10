@@ -19,6 +19,6 @@ class KLINE(XTsignal):
             if kline is None:
                 continue
             for k in kline:
-                if k['nm'] == name:
-                    print c, self.getName(c), name
+                if k['nm'] in name:
+                    print c, self.getName(c), k['nm']
 #
