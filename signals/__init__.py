@@ -3,6 +3,7 @@ from collections import OrderedDict
 import os
 import abc
 import json
+import redis
 
 
 class XTsignal(object):
@@ -46,6 +47,8 @@ class XTsignal(object):
 
             zq = zq + 1
 
+        self.__rdayk = redis.ConnectionPool(host='127.0.0.1', port=6379)
+
     def getPrevDay(self):
         zq   = self.__dtzq[self.__nday]
         pday = self.__zqdt[zq - 1]
@@ -67,16 +70,21 @@ class XTsignal(object):
                     ret[c] = json.loads(arr[1])
         return ret
 
-    def loadSignals(self, period='ALL'):
-        if period == 'ALL':
-            self.__nmonk  = self.loadJSON('monk')
-            self.__nweek  = self.loadJSON('week')
-            self.__ndayk  = self.loadJSON('dayk')
-            self.__n60min = self.loadJSON('60mink')
-            self.__n30min = self.loadJSON('30mink')
+    # GET DAY Signal from redis
+    def getNday(self, code, path):
+        key   = code + '_' + self.__nday
+        dbstr = self.__ndayk.get(key)
+        if dbstr is None:
+            return None
+        val = json.loads(dbstr)
+        for p in path:
+            if len(val) > 0:
+                val = val[p]
+        return val
 
-        if period == 'dayk':
-            self.__ndayk  = self.loadJSON('dayk')
+    def loadSignals(self, period='ALL'):
+        # connect2redis
+        self.__ndayk = redis.Redis(connection_pool=self.__rdayk)
 
     def getSignals(self):
         return (self.__nmonk, self.__nweek, self.__ndayk, \
