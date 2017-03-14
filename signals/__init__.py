@@ -82,6 +82,18 @@ class XTsignal(object):
                 val = val[p]
         return val
 
+    # GET DAY Signal from redis
+    def getJSON(self, code, path, day):
+        key   = code + '_' + day
+        dbstr = self.__ndayk.get(key)
+        if dbstr is None:
+            return None
+        val = json.loads(dbstr)
+        for p in path:
+            if len(val) > 0:
+                val = val[p]
+        return val
+
     def loadSignals(self, period='ALL'):
         # connect2redis
         self.__ndayk = redis.Redis(connection_pool=self.__rdayk)
