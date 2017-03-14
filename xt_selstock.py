@@ -5,6 +5,7 @@ from signals.multiperiod import MultiPeriod
 from signals.szl import SZL
 from signals.kline import KLINE
 from signals.zq import ZHOUQI
+from signals.ma import MA
 
 
 def select(dirs, nday):
@@ -29,16 +30,11 @@ def main(argv):
             code = arg
     dirs = './data/'
 
-    # output = './output/select/xt/mp/'
-    # sel = MultiPeriod(dirs, nday)
-    # sel.select(output)
-
-    # output = './output/xt/mp/'
-    # sel.dumpFT(output)
-
+    print '-------- KLINE --------------'
     sel = KLINE(dirs, nday)
-    sel.select('NZX')
+    sel.select({'NZX', 'yzbk', 'jumpgap'})
 
+    print '-------- ZHOUQi --------------'
     sel = ZHOUQI(dirs, nday)
     pairs = [(1, 4, 200), (2, 4, 100), (3, 4, 100), (4, 3, 500)]
     for p in pairs:
@@ -47,9 +43,13 @@ def main(argv):
             print 'T+' + str(p[0]), sl[0], sl[1], sl[2]
     sel.get(code)
 
-    output = './output/select/xt/szl/'
-    sel = SZL(dirs, nday)
-    sel.select(output)
+    print '-------- MA -----------------'
+    sel = MA(dirs, nday)
+    sel.select('bull', 1)
+    
+    # output = './output/select/xt/szl/'
+    # sel = SZL(dirs, nday)
+    # sel.select(output)
 
 if __name__ == "__main__":
     main(sys.argv[1:])
