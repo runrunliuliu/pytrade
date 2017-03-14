@@ -19,7 +19,7 @@ class ZHOUQI(XTsignal):
         fbret = dict(); pmret = dict(); gnret = dict()
         zq1 = zq[0]
         if zq1 is not None:
-            for i in range(1, fday + 1):
+            for i in range(0, fday + 1):
                 fbm = 0; pom = 0; gann = 0
                 for p in ['AF', 'BF', 'CF', 'DF', 'EF']:
                     if p not in zq1:
@@ -44,7 +44,7 @@ class ZHOUQI(XTsignal):
     def gannratio(self, zq, fday):
         ret = dict()
         if zq is not None:
-            for i in range(1, fday + 1):
+            for i in range(0, fday + 1):
                 m = 0
                 if 'DF' in zq and 'CD' in zq:
                     df = zq['DF'] + i
@@ -64,7 +64,7 @@ class ZHOUQI(XTsignal):
     def harmonic(self, zq, fday):
         ret = dict()
         if zq is not None:
-            for i in range(1, fday + 1):
+            for i in range(0, fday + 1):
                 m = 0
                 if 'DE' in zq and 'EF' in zq:
                     de = zq['DE']
@@ -81,14 +81,14 @@ class ZHOUQI(XTsignal):
         return (ret, )
 
     # 共振
-    def resonance(self, code):
+    def resonance(self, code, day):
         p1  = ['qs', 'zq', 'zq1'] 
-        zq1 =  self.getNday(code, p1)
+        zq1 =  self.getJSON(code, p1, day)
         p2  = ['qs', 'zq', 'zq2'] 
-        zq2 = self.getNday(code, p2)
+        zq2 = self.getJSON(code, p2, day)
 
         p3 = ['score']
-        score = self.getNday(code, p3)
+        score = self.getJSON(code, p3, day)
        
         timesq = self.timeseq((zq1, zq2), 5)
         gannsq = self.gannratio(zq1, 5)
@@ -100,7 +100,7 @@ class ZHOUQI(XTsignal):
         for s in sq:
             if len(s) == 0:
                 continue
-            for i in range(1, day + 1):
+            for i in range(0, day + 1):
                 tmp1 = 0
                 if i in s:
                     tmp1 = s[i] 
@@ -114,15 +114,18 @@ class ZHOUQI(XTsignal):
    
     # 获取
     def get(self, code):
-        gz = self.resonance(code)
+        day = self.getDay()
+        gz = self.resonance(code, day)
         print code, self.getName(code), gz
 
     # write Data
     def select(self, fday, rtime, score):
+        day = self.getDay()
         ret = []
         for c in self.__codes:
-            gz = self.resonance(c)
-            if fday in gz[0] and gz[0][fday] >= rtime and gz[1] > score:
+            gz = self.resonance(c, day)
+            if fday in gz[0] and gz[0][fday] >= rtime \
+                    and gz[1] > score and 0 not in gz[0]:
                 ret.append((c, self.getName(c), gz))
         return ret
 #
