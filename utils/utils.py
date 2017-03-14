@@ -1301,6 +1301,14 @@ def parseinst(codearr, bk='ALL'):
             out.append((fname,code))
         return out
 
+    if bk == 'LINE':
+        for c in codearr:
+            tmp   = c.split('-')
+            fname = tmp[-1]
+            code  = fname[0:8]
+            out.append((fname,code))
+        return out
+
     for c in codearr:
         tmp   = c.split('-')
         fname = tmp[-1]
