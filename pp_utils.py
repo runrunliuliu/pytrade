@@ -6,12 +6,12 @@ import multiprocessing as mp
 from strategies import intraTrade
 from utils.utils import TimeUtils
 from utils.utils import FileUtils
-from utils.utils import FakeTrade 
+from utils.utils import FakeTrade
 import datetime
 from utils import utils
-from events import macdseg 
-from events import month 
-from pyalgotrade.utils import instinfo 
+from events import macdseg
+from events import month
+from pyalgotrade.utils import instinfo
 
 
 # 格式转换
@@ -19,7 +19,7 @@ def TransFormat(index, fncodearr, div, dirs):
     start = div[index][0]
     end   = div[index][1]
     for i in range(start,end + 1):
-        fname = fncodearr[i][0] 
+        fname = fncodearr[i][0]
         oname = fname.split('_')[0]
         period = fname.split('_')[1].split('.')[0]
 
@@ -35,8 +35,8 @@ def TransFormat(index, fncodearr, div, dirs):
                 continue
             day = ''
             tmp = line.strip().split(',')
-            dt  = datetime.datetime.fromtimestamp(long(tmp[0])) 
-            if period == 'm': 
+            dt  = datetime.datetime.fromtimestamp(long(tmp[0]))
+            if period == 'm':
                 odir = 'monk'
                 day  = dt.strftime('%Y-%m-%d')
             if period == 'w':
@@ -50,9 +50,9 @@ def TransFormat(index, fncodearr, div, dirs):
                 day  = dt.strftime('%Y-%m-%d-%H-%M')
             nline = (day, tmp[1], tmp[2], tmp[3], tmp[4], tmp[5], tmp[4])
             output.append(nline)
-            cnt = cnt + 1 
+            cnt = cnt + 1
 
-        odir = './data/output/' + odir  
+        odir = './data/output/' + odir
         if not os.path.exists(odir):
             os.makedirs(odir)
         print 'D_TRANS:', odir, oname
@@ -66,6 +66,25 @@ def TransFormat(index, fncodearr, div, dirs):
         f.close()
 
 
+# 获取最后行
+def GetLastLine(index, fncodearr, div, dirs, odir):
+    start = div[index][0]
+    end   = div[index][1]
+    for i in range(start,end + 1):
+        fname = fncodearr[i][0]
+        oname = fname.split('_')[0]
+        line  = ''
+        for line in open(dirs + '/' + fname):
+            line = line.strip()
+            continue
+        if not os.path.exists(odir):
+            os.makedirs(odir)
+        f = open(odir + '/' + oname + '.csv', 'w')
+        f.write(line)
+        f.write('\n')
+        f.close()
+
+
 def main(argv):
     try:
         opts, args = getopt.getopt(argv,"h:d:s:m:t:",["day="])
@@ -76,25 +95,41 @@ def main(argv):
         if opt == '-h':
             print 'test.py -t <time> -o <outputfile>'
             sys.exit()
+        elif opt in ("-m", "--mode"):
+            mode  = arg
+        elif opt in ("-d", "--mode"):
+            day  = arg
 
     fs   = FileUtils('','','')
-    dirs = './data/tmp'
+
+    bk   = 'ALL'
+    dirs = './data/dayk/'
+    if mode == 'trans':
+        dirs = './data/tmp'
+        bk   = 'TMP'
+    if mode == 'line':
+        bk   = 'LINE'
+        dirs = './data/dayk/xingtai/'
+        odir = './data/dayk/' + day
+
     cores = 32
     codearr = fs.os_walk(dirs)
-
-    fncodearr = utils.parseinst(codearr, bk='TMP') 
+    fncodearr = utils.parseinst(codearr, bk=bk)
     div   = dict()
-    block = len(fncodearr) / cores 
-    left  = len(fncodearr) % cores 
+    block = len(fncodearr) / cores
+    left  = len(fncodearr) % cores
     start = 0
     for x in range(cores):
-        div[x] = (start,block * (x + 1) - 1) 
+        div[x] = (start,block * (x + 1) - 1)
         start  = start + block
     end = div[cores - 1][1] + left
     div[cores - 1] = (div[cores - 1][0],end)
 
     # Setup a list of processes that we want to run
-    processes = [mp.Process(target=TransFormat, args=(x,fncodearr,div, dirs)) for x in range(cores)]
+    if mode == 'trans':
+        processes = [mp.Process(target=TransFormat, args=(x,fncodearr,div, dirs)) for x in range(cores)]
+    if mode == 'line':
+        processes = [mp.Process(target=GetLastLine, args=(x,fncodearr,div, dirs, odir)) for x in range(cores)]
     
     # Run processes
     for p in processes:
