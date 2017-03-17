@@ -36,11 +36,19 @@ def main(argv):
 
     print '-------- ZHOUQi --------------'
     sel = ZHOUQI(dirs, nday)
+    sel.initZQ()
     pairs = [(1, 4, 200), (2, 4, 100), (3, 4, 100), (4, 3, 500)]
     for p in pairs:
         arr = sel.select(p[0], p[1], p[2])
         for sl in arr:
             print 'T+' + str(p[0]), sl[0], sl[1], sl[2]
+
+    pairs = [(3, 144, 10), (4, 144, 10), (5, 144, 10)]
+    for p in pairs:
+        out = sel.getSpecial(p[0], p[1], p[2])
+        for sl in out:
+            print 'SEPCIAL:' + str(p[1]), sl[0], sl[1], sl[2]
+
     sel.get(code)
 
     print '-------- MA -----------------'
