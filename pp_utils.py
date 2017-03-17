@@ -56,7 +56,7 @@ def TransFormat(index, fncodearr, div, dirs):
         if not os.path.exists(odir):
             os.makedirs(odir)
         print 'D_TRANS:', odir, oname
-        f = open(odir + '/' + oname + '.csv', 'w')
+        f = open(odir + '/' + oname, 'w')
         for v in output:
             out = ''
             for t in v:
