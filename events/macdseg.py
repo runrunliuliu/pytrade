@@ -25,13 +25,13 @@ class MacdSeg(eventprofiler.Predicate):
 
         self.__macd = {}
         self.__roc  = {}
-        self.__gd   = None
+        self.__gd   = {}
 
-        self.__fvalley = None
-        self.__fpeek   = None
-        self.__desline = None
-        self.__incline = None
-        self.__dropout = None
+        self.__fvalley = []
+        self.__fpeek   = []
+        self.__desline = {}
+        self.__incline = {}
+        self.__dropout = []
 
         self.__cxshort  = [] 
         self.__qcg      = [] 
@@ -42,11 +42,14 @@ class MacdSeg(eventprofiler.Predicate):
         self.__nbs      = []
         self.__ct       = []
         self.__xingtai  = [] 
-
-        self.__ftDes = None
-        self.__ftInc = None
         
-        self.__nowdesline = None
+        self.__hlcluster = []
+
+        self.__ftDes = set()
+        self.__ftInc = set()
+        
+        self.__nowdesline = {}
+        self.__nowincline = {}
         
         self.__baseinfo = baseinfo
 
