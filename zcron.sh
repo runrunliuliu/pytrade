@@ -3,7 +3,7 @@ source ~/.bashrc
 py=`which python`
 echo $py
 
-mkdir -p backtests 
+mkdir -p backtests
 mkdir -p data
 mkdir -p data
 mkdir -p output
@@ -19,17 +19,23 @@ day0=`date +"%Y-%m-%d"`
 echo $day0
 
 ###--- DOWNLOAD DT_BOARD
-rsync -uhavzm --stats --progress himalayas@139.129.99.51:/home/himalayas/apps2/qts/pytrade2/data/dtboard.csv ./data/ 
+rsync -uhavzm --stats --progress himalayas@139.129.99.51:/home/himalayas/apps2/qts/pytrade2/data/dtboard.csv ./data/
 
 ###--- 计算龙虎榜
 $py indicator.py
 
 ###--- TRAIN ---
 $py pp_selstock.py -m 'train' -s 2017-01-01 -d $day0 -t triangle -p day
-$py pp_selstock.py -m 'train' -s 2017-01-01 -d $day0 -t triangle -p week
-$py pp_selstock.py -m 'train' -s 2017-01-01 -d $day0 -t triangle -p month
-$py pp_selstock.py -m 'train' -s 2017-01-01 -d $day0 -t triangle -p 60min
-$py pp_selstock.py -m 'train' -s 2017-01-01 -d $day0 -t triangle -p 30min
+# $py pp_selstock.py -m 'train' -s 2017-01-01 -d $day0 -t triangle -p week
+# $py pp_selstock.py -m 'train' -s 2017-01-01 -d $day0 -t triangle -p month
+# $py pp_selstock.py -m 'train' -s 2017-01-01 -d $day0 -t triangle -p 60min
+# $py pp_selstock.py -m 'train' -s 2017-01-01 -d $day0 -t triangle -p 30min
+
+python pp_utils.py -m line -d $day0
+touch ./tmp/$day0.done
+tar -czvf ./tmp/$day0."dayk".tar.gz ./data/dayk/$day0/*
+rsync -uhavzm --stats --progress tmp/$day0.dayk.tar.gz  himalayas@139.129.99.51:/data/from_offline/kline_shape/
+rsync -uhavzm --stats --progress tmp/$day0.done  himalayas@139.129.99.51:/data/from_offline/kline_shape/
 
 nohup $py pp_selstock.py -m 'stock' -s 2016-08-01 -d $day0 -t triangle 1>logs/$day0.triangle.log 2>&1 &
 nohup $py pp_selstock.py -m 'stock' -s 2016-08-01 -d $day0 -t QUSHI 1>logs/$day0.qushi.log 2>&1 &
