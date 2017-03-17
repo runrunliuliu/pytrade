@@ -18,7 +18,7 @@ rsync -uhavzm --stats --progress himalayas@192.168.200.20:/home/himalayas/kline/
 tar -zxvf data/tmp/kline.tar.gz -C data/tmp/
 rm -f data/tmp/kline.tar.gz
 
-python pp_utils.py
+python pp_utils.py -m trans
 cp -r data/output/* data/
 
 # scp himalayas@139.129.99.51:/home/himalayas/apps2/qts/pytrade2/data/15mink/* ./data/15mink/
