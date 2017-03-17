@@ -135,7 +135,7 @@ def main(argv):
     q = Queue()
     logging.config.dictConfig(log.d)
 
-    cores = 108
+    cores = 112
     codearr = fs.os_walk(dirs)
 
     if mode == 'full' or mode == 'train':
