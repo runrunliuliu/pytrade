@@ -16,8 +16,8 @@ class MA(XTsignal):
     def fwMax(self, zq, start, total):
         m = -1
         for i in range(start, total + 1):
-            if i in zq and zq[i] > m:
-                m = zq[i]
+            if i in zq and len(zq[i]) > m:
+                m = len(zq[i])
         return m
 
     # write Data
@@ -46,11 +46,11 @@ class MA(XTsignal):
             if bull > score and hist > 0 and qshist == 1 and \
                     ((0 in nzq[0] and 1 not in nzq[0]) or \
                      (1 in nzq[0] and 0 not in nzq[0])) and \
-                    self.fwMax(nzq, 0, 5) > 2:
-                bbuy.append((c, self.getName(c), name, mas, nzq[0]))
+                    self.fwMax(nzq[0], 0, 5) > 2:
+                bbuy.append((c, self.getName(c), name, mas, nzq))
             if bull <= 0 and hist > 0 and (0 not in nzq[0] and 1 not in nzq[0]) \
-                    and above > 0 and self.fwMax(nzq, 0, 5) > 2:
-                xbuy.append((c, self.getName(c), name, mas, nzq[0]))
+                    and above > 0 and self.fwMax(nzq[0], 0, 5) > 2:
+                xbuy.append((c, self.getName(c), name, mas, nzq))
 
         def dump(arr, tag):
             for m in arr:
