@@ -32,7 +32,7 @@ def main(argv):
 
     print '-------- KLINE --------------'
     sel = KLINE(dirs, nday)
-    sel.select({'NZX', 'yzbk', 'jumpgap'})
+    sel.select({'NZX', 'yzbk', 'tphp'})
 
     print '-------- ZHOUQi --------------'
     sel = ZHOUQI(dirs, nday)
