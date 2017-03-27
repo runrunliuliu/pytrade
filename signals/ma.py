@@ -47,15 +47,15 @@ class MA(XTsignal):
                     ((0 in nzq[0] and 1 not in nzq[0]) or \
                      (1 in nzq[0] and 0 not in nzq[0])) and \
                     self.fwMax(nzq[0], 0, 5) > 2:
-                bbuy.append((c, self.getName(c), name, mas, nzq))
+                bbuy.append((c, self.getName(c), name, mas, nzq[0], nzq[1]))
             if bull <= 0 and hist > 0 and (0 not in nzq[0] and 1 not in nzq[0]) \
                     and above > 0 and self.fwMax(nzq[0], 0, 5) > 2:
-                xbuy.append((c, self.getName(c), name, mas, nzq))
+                xbuy.append((c, self.getName(c), name, mas, nzq[0], nzq[1]))
 
         def dump(arr, tag):
+            arr = sorted(arr, key=lambda x: x[5])
             for m in arr:
-                print tag, m[0], m[1], m[2], m[3], m[4]
+                print tag, m[0], m[1], m[2], m[3], m[4], m[5]
 
-        dump(bbuy, '多头')
         dump(xbuy, '蓄势')
 #
