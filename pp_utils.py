@@ -7,6 +7,7 @@ from strategies import intraTrade
 from utils.utils import TimeUtils
 from utils.utils import FileUtils
 from utils.utils import FakeTrade
+from ml.czsc import CZSC
 import datetime
 from utils import utils
 from events import macdseg
@@ -85,6 +86,13 @@ def GetLastLine(index, fncodearr, div, dirs, odir):
         f.close()
 
 
+# CZSC训练集生产
+def GenCZSC(index, fncodearr, div, dirs, odir):
+    czsc = CZSC(index, fncodearr, div, dirs)
+    czsc.run()
+
+
+# MAIN
 def main(argv):
     try:
         opts, args = getopt.getopt(argv,"h:d:s:m:t:",["day="])
@@ -111,6 +119,8 @@ def main(argv):
         bk   = 'LINE'
         dirs = './data/dayk/xingtai/'
         odir = './data/dayk/' + day
+    if mode == 'czsc':
+        odir = './data/czsc/' + day
 
     cores = 32
     codearr = fs.os_walk(dirs)
@@ -130,6 +140,8 @@ def main(argv):
         processes = [mp.Process(target=TransFormat, args=(x,fncodearr,div, dirs)) for x in range(cores)]
     if mode == 'line':
         processes = [mp.Process(target=GetLastLine, args=(x,fncodearr,div, dirs, odir)) for x in range(cores)]
+    if mode == 'czsc':
+        processes = [mp.Process(target=GenCZSC, args=(x,fncodearr,div, dirs, odir)) for x in range(cores)]
     
     # Run processes
     for p in processes:
