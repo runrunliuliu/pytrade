@@ -42,6 +42,8 @@ class MacdSeg(eventprofiler.Predicate):
         self.__nbs      = []
         self.__ct       = []
         self.__xingtai  = [] 
+
+        self.__indicator = [] 
         
         self.__hlcluster = []
 
@@ -108,6 +110,9 @@ class MacdSeg(eventprofiler.Predicate):
 
     def getXINGTAI(self):
         return self.__xingtai
+
+    def getIndicator(self):
+        return self.__indicator
 
     def getQCG(self):
         return self.__qcg
@@ -338,6 +343,9 @@ class MacdSeg(eventprofiler.Predicate):
 
         XINGTAI = self.__macd[instrument][-1][25]
         self.__xingtai.append((dateTime, XINGTAI))
+        
+        INDICATOR = self.__macd[instrument][-1][26]
+        self.__indicator.append((dateTime, INDICATOR))
 
         self.__ftDes = self.__macd[instrument][-1][15]
         self.__ftInc = self.__macd[instrument][-1][16]
