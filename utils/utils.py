@@ -133,6 +133,8 @@ class DumpFeature(object):
         self.__cxshort = obj.getCXshort()
         self.__qcg     = obj.getQCG()
         self.__xingtai = obj.getXINGTAI()
+
+        self.__indicator = obj.getIndicator()
         
         self.__qushi = obj.getQUSHI()
         self.__dt    = obj.getDT()
@@ -164,6 +166,7 @@ class DumpFeature(object):
         self.QCG2csv('qcg')
         self.XT2csv('xingtai')
         self.redisXT2csv('xingtai')
+        self.ind2csv('indicator')
 
         # 趋势线策略 
         self.TradeSignal2csv('qushi', 1, 'trade')
@@ -213,6 +216,33 @@ class DumpFeature(object):
             if self.__period == '60min':
                 dd  = k.strftime('%Y-%m-%d-%H-%M')
             f.write(dd + '\t' +  out)
+            f.write('\n')
+        f.close()
+
+    # Dump indicator format
+    def ind2csv(self, subdir):
+        dirs = self.__dir + '/' + subdir
+        if not os.path.exists(dirs):
+            os.makedirs(dirs)
+        f = open(dirs + '/' + self.__inst[0][1] + '.csv', 'w')
+
+        for cx in self.__indicator:
+            k = cx[0]
+            v = cx[1]
+            if v is None:
+                continue
+            # MA
+            ma = v[0]
+            dd  = k.strftime('%Y-%m-%d')
+
+            arr = [] 
+            for i in [5, 10, 20, 30, 60, 90, 120, 250]:
+                val = '-1'
+                if i in ma:
+                    val = "{:.2f}".format(ma[i])
+                arr.append(val)
+            out = ','.join(arr)
+            f.write(dd + ',' +  out)
             f.write('\n')
         f.close()
 
