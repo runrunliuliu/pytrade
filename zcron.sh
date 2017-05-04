@@ -24,6 +24,10 @@ rsync -uhavzm --stats --progress himalayas@139.129.99.51:/home/himalayas/apps2/q
 ###--- 计算龙虎榜
 $py indicator.py
 
+### link缠中说缠
+unlink data/czsc
+ln -s /data/lihz/data/$day0/shape1 data/czsc
+
 ###--- TRAIN ---
 $py pp_selstock.py -m 'train' -s 2017-01-01 -d $day0 -t triangle -p day
 # $py pp_selstock.py -m 'train' -s 2017-01-01 -d $day0 -t triangle -p week
@@ -31,6 +35,7 @@ $py pp_selstock.py -m 'train' -s 2017-01-01 -d $day0 -t triangle -p day
 # $py pp_selstock.py -m 'train' -s 2017-01-01 -d $day0 -t triangle -p 60min
 # $py pp_selstock.py -m 'train' -s 2017-01-01 -d $day0 -t triangle -p 30min
 
+mkdir -p ./data/dayk/$day0/
 python pp_utils.py -m line -d $day0
 touch ./tmp/$day0.done
 tar -czvf ./tmp/$day0."dayk".tar.gz ./data/dayk/$day0/*
