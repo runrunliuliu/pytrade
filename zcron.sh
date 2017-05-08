@@ -42,6 +42,9 @@ tar -czvf ./tmp/$day0."dayk".tar.gz ./data/dayk/$day0/*
 rsync -uhavzm --stats --progress tmp/$day0.dayk.tar.gz  himalayas@139.129.99.51:/data/from_offline/kline_shape/
 rsync -uhavzm --stats --progress tmp/$day0.done  himalayas@139.129.99.51:/data/from_offline/kline_shape/
 
+rsync -uhavzm --stats --progress tmp/$day0.dayk.tar.gz  himalayas@192.168.200.20:/data/from_offline/kline_shape/
+rsync -uhavzm --stats --progress tmp/$day0.done  himalayas@192.168.200.20:/data/from_offline/kline_shape/
+
 nohup $py pp_selstock.py -m 'stock' -s 2016-08-01 -d $day0 -t triangle 1>logs/$day0.triangle.log 2>&1 &
 nohup $py pp_selstock.py -m 'stock' -s 2016-08-01 -d $day0 -t QUSHI 1>logs/$day0.qushi.log 2>&1 &
 nohup $py pp_selstock.py -m 'stock' -s 2016-08-01 -d $day0 -t nbs 1>logs/$day0.nbs.log 2>&1 &
