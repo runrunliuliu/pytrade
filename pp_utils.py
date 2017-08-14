@@ -78,8 +78,6 @@ def GetLastLine(index, fncodearr, div, dirs, odir):
         for line in open(dirs + '/' + fname):
             line = line.strip()
             continue
-        if not os.path.exists(odir):
-            os.makedirs(odir)
         f = open(odir + '/' + oname + '.csv', 'w')
         f.write(line)
         f.write('\n')
