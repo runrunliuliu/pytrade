@@ -76,12 +76,12 @@ def main(plot, argv):
         elif opt in ("-p", "--period"):
             period = arg
 
-    fromMonth = 1
+    fromMonth = 9
     fromDay   = 1
-    toMonth   = 2
+    toMonth   = 12
     toDay     = 24
     start_time = datetime.datetime(2015,fromMonth,fromDay,00,00)
-    end_time   = datetime.datetime(2017,toMonth,toDay,00,00)
+    end_time   = datetime.datetime(2019,toMonth,toDay,00,00)
     barFilter  = csvfeed.CHINAEquitiesRTH(start_time,end_time)
     baseinfo = instinfo.InstrumentInfo('data/stockinfo.csv')
 
@@ -106,35 +106,7 @@ def main(plot, argv):
     feed = yahoofeed.Feed(frequency=freq)
 
     instfiles = fncodearr
-    # instfiles = [("SH600007.csv","SH600007"),("SZ002333.csv","SZ002333")]
-    # instfiles = [("SZ000629.csv","SZ000629")]
-    # instfiles = [("SZ300315.csv","SZ300315")]
-    # instfiles = [("SZ300294.csv","SZ300294")]
-    # instfiles = [("SH603003.csv","SH603003")]
-    # instfiles = [("SH600326.csv","SH600326")]
-    # instfiles = [("SZ002208.csv","SZ002208")]
-    # instfiles = [("SZ300346.csv","SZ300346")]
-    # instfiles = [("SZ300358.csv","SZ300358")]
-    # instfiles = [("SZ002248.csv","SZ002248")]
-    # instfiles = [("SH600436.csv","SH600436")]
-    # instfiles = [("SH601801.csv","SH601801")]
-    # instfiles = [("SH603558.csv","SH603558")]
-    # instfiles = [("SH600395.csv","SH600395")]
-    # instfiles = [("SH600256.csv","SH600256")]
-    # instfiles = [("SH603800.csv","SH603800")]
-    # instfiles = [("SH600619.csv","SH600619")]
-    # instfiles = [("SH601668.csv","SH601668")]
-    # instfiles = [("SH600202.csv","SH600202")]
-    # instfiles = [("SZ300136.csv","SZ300136")]
-    # instfiles = [("SZ002195.csv","SZ002195")]
-    # instfiles = [("SZ002092.csv","SZ002092")]
-    # instfiles = [("SZ300287.csv","SZ300287")]
-    # instfiles = [("SZ300221.csv","SZ300221")]
-    # instfiles = [("SZ002517.csv","SZ002517")]
-    # instfiles = [("BK300041.csv","BK300041")]
-    # instfiles = [("SH600052.csv","SH600052")]
     instfiles = [("ZS000001.csv","ZS000001")]
-    # instfiles = [("ZS399006.csv","ZS399006")]
     insts  = []
 
     # LOG CONFIGURE
