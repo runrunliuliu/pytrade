@@ -7,7 +7,13 @@ day0=`date +"%Y-%m-%d"`
 echo $day0
 
 trade='kline'
+trade='triangle'
 
+sday='2017-01-03'
+eday=$day0
+nohup $py pp_selstock.py -m 'mock' -s $sday -d $eday -t $trade 1>logs/$sday'_'$eday'.log' 2>&1 &
+
+exit
 sday='2006-01-04'
 eday='2016-08-08'
 nohup $py pp_selstock.py -m 'mock' -s $sday -d $eday -t $trade 1>logs/$sday'_'$eday'.log' 2>&1 &
