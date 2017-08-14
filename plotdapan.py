@@ -134,7 +134,7 @@ def main(plot, argv):
     eventProfiler = eventprofiler.Profiler(predicate, 1, 1)
     eventProfiler.run(feed, 2, True)
 
-    dump = utils.DumpFeature(predicate, instfiles, dirpath)
+    dump = utils.DumpFeature(predicate, instfiles, dirpath, period)
     dump.ToDump()
 
     q.put(None)
