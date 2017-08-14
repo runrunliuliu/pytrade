@@ -166,7 +166,7 @@ class DumpFeature(object):
         self.QCG2csv('qcg')
         self.XT2csv('xingtai')
         self.redisXT2csv('xingtai')
-        self.ind2csv('indicator')
+        # self.ind2csv('indicator')
 
         # 趋势线策略 
         self.TradeSignal2csv('qushi', 1, 'trade')
@@ -219,7 +219,7 @@ class DumpFeature(object):
             f.write('\n')
         f.close()
 
-    # Dump indicator format
+    # Deprace Dump indicator format
     def ind2csv(self, subdir):
         dirs = self.__dir + '/' + subdir
         if not os.path.exists(dirs):
