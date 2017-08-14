@@ -5,7 +5,6 @@ import re
 from ml.merge import Merge 
 from ml.fteng import FTeng 
 import ml.utils as mutils
-from utils import utils
 import xgboost as xgb
 import numpy as np
 from sklearn.metrics import confusion_matrix 
@@ -64,7 +63,7 @@ def train(path, code):
     # use softmax multi-class classification
     # scale weight of positive examples
     param['eta']               = 0.10
-    num_round                  = 150
+    num_round                  = 100
     param['subsample']         = 1.0
     param['colsample_bytree']  = 0.7 
     param['colsample_bylevel'] = 0.8 
@@ -235,9 +234,8 @@ def main(plot, argv):
     code = 'ZS000001'
     odir = './output/fts'
 
-    ts = utils.TimeUtils()
     # Load Data
-    mg = Merge(code, './data/', odir, ts)
+    mg = Merge(code, './data/', odir)
     mg.combFeatures()
 
     # Feature Engineering
