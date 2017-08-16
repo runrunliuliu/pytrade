@@ -10,7 +10,8 @@ trade='kline'
 trade='triangle'
 
 sday='2017-01-03'
-eday=$day0
+eday='2017-08-14'
+# eday=$day0
 nohup $py pp_selstock.py -m 'mock' -s $sday -d $eday -t $trade 1>logs/$sday'_'$eday'.log' 2>&1 &
 
 exit
