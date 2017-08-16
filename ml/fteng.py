@@ -17,8 +17,6 @@ class FTeng(object):
         self.__trange = self.loadrange('./ml/trange.conf')
 
         self.loadata(path + '/' + code + '.ft.csv', ['zd', 'ss', 'xj'], False) 
-        # self.parse2libsvm(2, path + '/' + code + '.raw.csv')
-        # self.parse2libsvm(3, path + '/' + code + '.raw.csv')
         self.parse2libsvm(4, path + '/' + code + '.raw.csv')
 
     def dumpft(self):
