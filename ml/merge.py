@@ -316,7 +316,6 @@ class Merge(object):
 
         self.transFT2('test2.txt')
 
-        # (ft2header, ft2dict) = self.loadFT2(self.__inst + '.ft2.csv')
         (ft2header, ft2dict, ft2len) = self.loadFT3(self.__inst + '.ft3.csv')
 
         self.__header = 'day,' + self.__header + ',' + ft2header + ',ret1,ret2,ret3,ret4,ret5,ret6,ret7,ret8'
@@ -340,7 +339,6 @@ class Merge(object):
             fret1 = ','.join(self.getFRet(k))
             fret2 = ','.join(self.getFOneDayRet(k))
             f.write(k + ',' + ft15k + ',' + v + ',' + ft2flat + ',' + fret1 + ',' + fret2)
-            # f.write(k + ',' + ft15k + ',' + v + ',' + fret1 + ',' + fret2)
             f.write('\n')
         f.close()
 #
