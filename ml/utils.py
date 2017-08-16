@@ -170,15 +170,9 @@ def showTree(bst, ntree):
 
 
 def debugTree(bst, xg_test):
-    # 0909
-    nsample = 171
-    # 0908
-    # nsample = 170 
-    # 0907
-    # nsample = 169
-
     linenum = 0
     debugTree = bst.predict(xg_test, pred_leaf=True)
+    nsample = debugTree.shape[0]
 
     _NODEPAT = re.compile(r'(\d+):\[(.+)\]')
     _LEAFPAT = re.compile(r'(\d+):(leaf=.+)')
