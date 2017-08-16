@@ -76,12 +76,21 @@ def main(plot, argv):
         elif opt in ("-p", "--period"):
             period = arg
 
+    # Train Data
+    # fromMonth = 1 
+    # fromDay   = 1
+    # toMonth   = 12
+    # toDay     = 24
+    # start_time = datetime.datetime(2001,fromMonth,fromDay,00,00)
+    # end_time   = datetime.datetime(2019,toMonth,toDay,00,00)
+
     fromMonth = 9
     fromDay   = 1
     toMonth   = 12
     toDay     = 24
     start_time = datetime.datetime(2015,fromMonth,fromDay,00,00)
     end_time   = datetime.datetime(2019,toMonth,toDay,00,00)
+
     barFilter  = csvfeed.CHINAEquitiesRTH(start_time,end_time)
     baseinfo = instinfo.InstrumentInfo('data/stockinfo.csv')
 
