@@ -750,27 +750,35 @@ class FakeTrade(object):
             
             tkdk = float(self.__mtime[bbkey][19])
 
-        # -------------- 买入 ---------------------------
-        if tp == 1 and self.__bear == 1 and yby < -0.02:
-            comment = 'No Buy Bear_Market_YBY'
-            ret = 1
-            return (ret, comment, ref)
-        if tp == 7 and self.__bear == 1 and (vret + pret) == 2:
-            comment = 'No Buy Bear_Market_BelowQS'
-            ret = 1
-            return (ret, comment, ref)
-        if tp == 7 and self.__bear == 1 and (qsxt == 301 or qsxt == 103 or qsxt == 202) and (vret + pret) == 1:
-            comment = 'No Buy Bear_Market_InDescQS_' + str(qsxt)
-            ret = 1
-            return (ret, comment, ref)
-        if tp == 7 and dma250 <= 0.00005 and pma250 > -0.10 and pma250 < 0.08: 
-            comment = 'No Buy ALL_Market_Around_DesMA250'
-            ret = 1
-            return (ret, comment, ref)
-        if tp == 7 and (comxt == '101.0|102.0' or comxt == '301.0|302.0'): 
-            comment = 'No Buy ALL_Market_' + comxt
-            ret = 1
-            return (ret, comment, ref)
+            pqs   = self.__mtime[bbkey][36]
+            nqs   = self.__mtime[bbkey][37]
+            comqs = str(pqs) + '|' + str(nqs) 
+
+            # -------------- 买入 ---------------------------
+            if tp == 1 and self.__bear == 1 and yby < -0.02:
+                comment = 'No Buy Bear_Market_YBY'
+                ret = 1
+                return (ret, comment, ref)
+            if tp == 7 and self.__bear == 1 and (vret + pret) == 2:
+                comment = 'No Buy Bear_Market_BelowQS'
+                ret = 1
+                return (ret, comment, ref)
+            if tp == 7 and self.__bear == 1 and (qsxt == 301 or qsxt == 103 or qsxt == 202) and (vret + pret) == 1:
+                comment = 'No Buy Bear_Market_InDescQS_' + str(qsxt)
+                ret = 1
+                return (ret, comment, ref)
+            if tp == 7 and dma250 <= 0.00005 and pma250 > -0.10 and pma250 < 0.08: 
+                comment = 'No Buy ALL_Market_Around_DesMA250'
+                ret = 1
+                return (ret, comment, ref)
+            if tp == 7 and (comxt == '101.0|102.0' or comxt == '301.0|302.0'): 
+                comment = 'No Buy ALL_Market_' + comxt
+                ret = 1
+                return (ret, comment, ref)
+            if comqs == '1302.0|2303.0':
+                comment = 'No Buy ALL_Market_COMQS_' + comqs
+                ret = 1
+                return (ret, comment, ref)
 
         # -------------- 调仓 ---------------------------
         if tp == 8 and self.__bear == 1 and ((vret + pret) == 2 or (qsxt == 202 and (vret + pret) == 1)):
@@ -872,7 +880,7 @@ class FakeTrade(object):
                 continue
             (flag, comment, ref) = self.forceDrop(t, nday, forcetp)
             if flag == 1:
-                print 'DEBUG:', nday, comment, t[0], t[1] 
+                print 'DEBUG:', nday, comment, t[0], t[1], t[2]
                 continue
             ftups.append(t)
         self.printNextDay(nday, ftups, tzuhe)
@@ -999,7 +1007,7 @@ class FakeTrade(object):
                 if len(self.__zuhe) == numzuhe:
                     break
                 if nbuy == maxbuy:
-                    print 'DEBUG:', nday, 'NO BUY', nbuy, maxbuy, nxday, t[0], t[1] 
+                    print 'DEBUG:', nday, 'NO BUY', nbuy, maxbuy, nxday, t[0], t[1], t[2]
                     break
                 if t[0][0:2] == 'ZS':
                     print 'DEBUG:', nday, 'NO BUY ZHISHU', t[0]
@@ -1007,7 +1015,7 @@ class FakeTrade(object):
 
                 (flag, comment, ref) = self.forceDrop(t, nday, forcetp)
                 if flag == 1:
-                    print 'DEBUG:', nday, comment, t[0], t[1] 
+                    print 'DEBUG:', nday, comment, t[0], t[1], t[2] 
                     continue
                 bp = self.buy(t, nxday, nday)
                 if bp is not None and t[0] not in self.__holds:
@@ -1017,7 +1025,7 @@ class FakeTrade(object):
                     nbuy = nbuy + 1
                 else:
                     if t[0] in self.__holds:
-                        print 'DEBUG:', nday, 'Drop Holded', t[0], t[1], nxday
+                        print 'DEBUG:', nday, 'Drop Holded', t[0], t[1], t[2], nxday
         tdetail = self.trackZH(end,retslog)
         self.printTable(retslog, tdetail, end)
         print '...........FINISHED........'
