@@ -1,3 +1,4 @@
+# coding:utf-8
 import datetime
 import re
 import numpy as np
@@ -169,10 +170,11 @@ def showTree(bst, ntree):
     plt.savefig('tree.png')
 
 
-def debugTree(bst, xg_test):
+def debugTree(bst, xg_test, index):
     linenum = 0
     debugTree = bst.predict(xg_test, pred_leaf=True)
-    nsample = debugTree.shape[0]
+    #nsample = debugTree.shape[0]
+    nsample = index + 1 
 
     _NODEPAT = re.compile(r'(\d+):\[(.+)\]')
     _LEAFPAT = re.compile(r'(\d+):(leaf=.+)')
@@ -234,6 +236,8 @@ def debugTree(bst, xg_test):
         linenum = linenum + 1
         if linenum == nsample:
             score = []
+            fposdict = dict()
+            fnegdict = dict()
             negnodes = dict()
             posnodes = dict()
             for i in range(0, len(d)):
@@ -251,31 +255,43 @@ def debugTree(bst, xg_test):
                             yes, no, missing = match.groups()
                         arrEdges.append((yes, no, missing))
                 (desc, lscore, nodes) = travelTree(str(d[i]))
-
-                def add2nodes(nodes, dictnodes):
+                def add2nodes(nodes, dictnodes, score, fdict):
                     for n in nodes:
                         cnt = 1
                         if n in dictnodes:
                             cnt = dictnodes[n] + 1
                         dictnodes[n] = cnt
 
-                if float(lscore) > 0:
-                    add2nodes(nodes, posnodes)
-                if float(lscore) < 0:
-                    add2nodes(nodes, negnodes)
+                        tscore = 0.0
+                        findex = n.split('<')[0][1:]
+                        if findex in fdict:
+                            tscore = fdict[findex]
+                        tscore = tscore + score
+                        fdict[findex] = tscore
 
-                if float(lscore) < -0.05:
-                    print i, d[i], len(d), desc
-                if float(lscore) > 0.05:
-                    print i, d[i], len(d), desc
+                if float(lscore) > 0:
+                    add2nodes(nodes, posnodes, float(lscore), fposdict)
+                if float(lscore) < 0:
+                    add2nodes(nodes, negnodes, float(lscore), fnegdict)
 
                 score.append(float(lscore))
 
-            sorted_neg = sorted(negnodes.items(), key=operator.itemgetter(1))
-            print 'neg:', sorted_neg[-3:]
-
-            sorted_pos = sorted(posnodes.items(), key=operator.itemgetter(1))
-            print 'pos:', sorted_pos[-3:]
-
-            print np.sum(score)
+            # Positive Score means BAODIE
+            # flag 1,  偏多
+            # flag 0,  中性
+            # flag -1, 偏空
+            ft_flag = dict()
+            for k, v in fposdict.iteritems():
+                if k in fnegdict:
+                    flag  = 0
+                    ratio = abs(fnegdict[k]) / v
+                    if ratio > 1.2:
+                        flag = 1
+                    if ratio < 0.8: 
+                        flag = -1
+                    if ratio >=0.8 and ratio<= 1.2:
+                        flag = 0
+                    ft_flag[k] = flag 
+            return ft_flag
+            break
 #
