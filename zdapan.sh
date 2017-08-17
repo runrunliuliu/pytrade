@@ -5,11 +5,11 @@ echo $py
 
 mkdir -p backtests 
 mkdir -p data
-mkdir -p data
 mkdir -p output
 mkdir -p logs
 mkdir -p output/nbs/
 mkdir -p output/kline/
+mkdir -p output/ft/ 
 
 # download data
 # bash download.sh
@@ -33,6 +33,6 @@ else
     $py gbdt.py -m predict -n 60 >output/dapan/$dayH".log"
 fi
 
-python dbaction.py -t tb_dapan_bd_day_list -a replace -d 2 -i output/fts/ZS000001.test.pred.csv -m $timestamp 
-python dbaction.py -t tb_dapan_bd_day_feature_list -a replace -d 2 -i output/fts/ZS000001.ft.flag -m $timestamp
+python dbaction.py -t tb_dapan_bd_day_list -a replace -d 3 -i output/fts/ZS000001.test.pred.csv -m $timestamp 
+python dbaction.py -t tb_dapan_bd_day_feature_list -a replace -d 3 -i output/fts/ZS000001.ft.flag -m $timestamp
 
