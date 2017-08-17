@@ -21,6 +21,16 @@ class dbimport:
             db_url  = '192.168.200.30'
             dbname  = 'stock_misc'
             self.db = MySQLdb.connect(db_url,db_user,db_pass,dbname,charset='utf8')
+        if db == 3:
+            arr = []
+            for line in open('/home/himalayas/apps/conf/db.conf'):
+                arr.append(line.strip())
+            db_url  = arr[0]
+            db_user = arr[1] 
+            db_pass = arr[2]
+            dbname  = 'stock_misc'
+            self.db = MySQLdb.connect(db_url,db_user,db_pass,dbname,charset='utf8')
+
         self.uptime = uptime
 
     def loadata(self,path):
