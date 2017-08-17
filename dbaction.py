@@ -9,13 +9,14 @@ from utils.utils import FileUtils
 
 
 def parseopt(argv):
-    dbname = ''
+    dbserv    = 1
     inputfile = ''
-    table = ''
-    action = ''
+    table     = ''
+    action    = ''
+    uptime    = 0
 
     try:
-        opts, args = getopt.getopt(argv,"hi:d:t:a:",["ifile=","db=","table=","action="])
+        opts, args = getopt.getopt(argv,"hi:d:t:a:m:",["ifile=","db=","table=","action="])
     except getopt.GetoptError:
         print 'test.py -i <inputfile> -o <outputfile>'
         sys.exit(2)
@@ -26,13 +27,15 @@ def parseopt(argv):
         elif opt in ("-i", "--ifile"):
             inputfile = arg
         elif opt in ("-d", "--db"):
-            dbname    = arg
+            dbserv    = int(arg)
         elif opt in ("-t", "--table"):
             table     = arg
         elif opt in ("-a", "--action"):
             action    = arg
+        elif opt in ("-m", "--time"):
+            uptime    = int(arg)
 
-    return[dbname,inputfile,table,action]
+    return[dbserv, inputfile, table, action, uptime]
 
 
 def replace(db,table,action,inputfile):
@@ -41,6 +44,12 @@ def replace(db,table,action,inputfile):
         db.import2db(table,action,jout)
     if table == 'tb_dtboard_raw':
         jout = db.parseDT(inputfile)
+        db.import2db(table,action,jout)
+    if table == 'tb_dapan_bd_day_list':
+        jout = db.parseDapan(inputfile)
+        db.import2db(table,action,jout)
+    if table == 'tb_dapan_bd_day_feature_list':
+        jout = db.parseFT(inputfile)
         db.import2db(table,action,jout)
     if table == 'gubaeast':
         outdir = '.'
@@ -69,10 +78,10 @@ def replace(db,table,action,inputfile):
 
 
 def main(argv):
-    [dbname,inputfile,table,action] = parseopt(argv)
+    [dbserv, inputfile, table, action, uptime] = parseopt(argv)
     if action == 'replace':
-        db = dbimport(dbname)
-        replace(db,table,action,inputfile)
+        db = dbimport(dbserv, uptime)
+        replace(db, table, action, inputfile)
         
     if action == 'fetchall':
         db = dbexport()
