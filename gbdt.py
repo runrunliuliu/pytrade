@@ -194,8 +194,13 @@ def PredictDebug(odir, code, yprob, test_Y, threshold):
 
     print >> sys.stderr, classification_report(nylabel, ntest_Y)
 
+# Used to Describe Feature Value
+def FeatureEval(bst, xg_test, path, code, index, day):
+    ft_flag = mutils.debugTree(bst, xg_test, index)
+    return ft_flag
 
-def predict(path, code):
+# Predict
+def predict(path, code, fnum):
     key_value = loadtxt(path + '/' + code + '.test.csv.index', delimiter=",")
     test_ind  = { int(k):int(v) for k,v in key_value }
 
@@ -207,20 +212,30 @@ def predict(path, code):
     ylabel = np.argmax(yprob, axis=1)
     test_Y = xg_testd.get_label()
     
+    f = open(path + '/' + code +  '.ft.flag', 'w')
     for i in range(0, len(yprob)):
         tmp     = str(int(test_Y[i]))
         test_day = test_ind[int(tmp)] 
         plabel  = ylabel[i]
         print test_day, plabel, yprob[i][plabel]
 
-    PredictDebug(path, code, yprob, test_Y, 0.5)
+        if i >= len(yprob) - fnum:
+            ft_flag = FeatureEval(bst, xg_testd, path, code, i, test_day)
+            out = [] 
+            for k, v in ft_flag.iteritems():
+                out.append(k + ':' + str(v))
+            f.write(str(test_day) + ' ' + ','.join(out))
+            f.write('\n')
+    f.close()
 
+    PredictDebug(path, code, yprob, test_Y, 0.5)
 
 # Main
 def main(plot, argv):
     mode = ''
+    fnum = 1
     try:
-        opts, args = getopt.getopt(argv,"h:m:",["mode="])
+        opts, args = getopt.getopt(argv,"h:m:n:",["mode="])
     except getopt.GetoptError:
         print 'test.py -d <time>'
         sys.exit(2)
@@ -230,6 +245,8 @@ def main(plot, argv):
             sys.exit()
         elif opt in ("-m", "--mode"):
             mode = arg
+        elif opt in ("-n", "--number"):
+            fnum = int(arg)
 
     code = 'ZS000001'
     odir = './output/fts'
@@ -250,7 +267,7 @@ def main(plot, argv):
     if mode == 'train':
         train(odir, code)
     if mode == 'predict':
-        predict(odir, code)
+        predict(odir, code, fnum)
 
 
 if __name__ == "__main__":
