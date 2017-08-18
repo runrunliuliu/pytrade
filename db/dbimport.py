@@ -85,7 +85,7 @@ class dbimport:
                 for kv in ftval[ind]:
                     (k, v) = kv.split(':')
                     k = 'f' + k
-                    if k in fdict and v != '1024201':
+                    if k in fdict and v != '1024201' and k in fname:
                         out['fid']    = fname[k][0]
                         out['fname']  = fname[k][1]
                         out['val']    = v
