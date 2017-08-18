@@ -9,7 +9,8 @@ mkdir -p output
 mkdir -p logs
 mkdir -p output/nbs/
 mkdir -p output/kline/
-mkdir -p output/ft/ 
+mkdir -p output/fts/
+mkdir -p output/dapan/
 
 # download data
 # bash download.sh
@@ -28,9 +29,9 @@ scp himalayas@139.129.99.51:/home/himalayas/apps/web_dev/cron/app/stock_minning/
 if [ $HOUR == "15" ];then
     $py plotdapan.py -p 'day'
     $py plotdapan.py -p '15min'
-    $py gbdt.py -m predict -n 60 >output/dapan/$dayH".log"
+    $py gbdt.py -m predict -n 1 >output/dapan/$dayH".log"
 else
-    $py gbdt.py -m predict -n 60 >output/dapan/$dayH".log"
+    $py gbdt.py -m predict -n 1 >output/dapan/$dayH".log"
 fi
 
 python dbaction.py -t tb_dapan_bd_day_list -a replace -d 3 -i output/fts/ZS000001.test.pred.csv -m $timestamp 
