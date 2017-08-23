@@ -1070,6 +1070,7 @@ class FakeTrade(object):
         (curholds, curuseage, curtotal) = self.printZH(nday, tdetail, zuhe)
 
         # T + 1 day
+        self.updateBB(nday)
         for t in tups:
             (flag, comment, ref) = self.forceDrop(t, nday, forcetp)
             if flag == 1:
