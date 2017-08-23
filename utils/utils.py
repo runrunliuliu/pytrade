@@ -827,15 +827,15 @@ class FakeTrade(object):
             (ret, comment, ref) = self.sztime(nday, tp)
         if tp == 7 or tp == 8:
             if tp == 7:
-                (szret, comment, ref) = self.sztime(nday, 5)
+                szret = self.sztime(nday, 5)
                 if szret[0] == 1:
-                    return (szret, comment, ref)
+                    return szret
                 else:
                     (ret, comment, ref) = self.mtime(code, nday, tp, nxday)
             if tp == 8:
-                (szret, comment, ref) = self.sztime(nday, 6)
+                szret = self.sztime(nday, 6)
                 if szret[0] == 1:
-                    return (szret, comment, ref)
+                    return szret
                 else:
                     (ret, comment, ref) = self.mtime(code, nday, tp, nxday)
         return (ret, comment, ref)
@@ -879,6 +879,7 @@ class FakeTrade(object):
             if check is False:
                 continue
             (flag, comment, ref) = self.forceDrop(t, nday, forcetp)
+            print 'DEBUG:', nday, flag, comment
             if flag == 1:
                 print 'DEBUG:', nday, comment, t[0], t[1], t[2]
                 continue
