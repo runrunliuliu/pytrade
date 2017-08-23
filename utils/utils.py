@@ -413,7 +413,7 @@ class FakeTrade(object):
         self.__stoplos     = 0.92
         self.__bearstopwin = 1.05
         self.__bearstoplos = 0.92
-        self.__numzuhe     = 6
+        self.__numzuhe     = 4
         self.__maxbuy      = 1
 
         if trade.getName() == 'nbs':
@@ -1000,6 +1000,7 @@ class FakeTrade(object):
             tups = self.__tradesignal[nday] 
             tups = self.__trade.resortTrades(tups)
             nbuy = 0
+            dropbuy = 0
             for t in tups:
                 if len(self.__zuhe) == numzuhe:
                     break
@@ -1009,10 +1010,10 @@ class FakeTrade(object):
                 if t[0][0:2] == 'ZS':
                     print 'DEBUG:', nday, 'NO BUY ZHISHU', t[0]
                     continue
-
                 (flag, comment, ref) = self.forceDrop(t, nday, forcetp)
                 if flag == 1:
                     print 'DEBUG:', nday, comment, t[0], t[1], t[2] 
+                    dropbuy = dropbuy + 1
                     continue
                 bp = self.buy(t, nxday, nday)
                 if bp is not None and t[0] not in self.__holds:
