@@ -9,7 +9,10 @@ from pyfolio import round_trips
 class folio(object):
 
     def __init__(self, start=None, end=None):
-        strategy = self.initRets('./backtests/20060104_20160104.rets.csv', 'triangle', 'cash')
+        start = start.replace('-', '')
+        end   = end.replace('-','')
+
+        strategy = self.initRets('./backtests/' + start + '_' + end + '.rets.csv', 'triangle', 'cash')
         self.__strategy = strategy.T.iloc[0]
 
         szzs = self.initRets('./data/dayk/ZS000001.csv', 'SZZS', 'Close')
@@ -20,7 +23,7 @@ class folio(object):
 
         self.__base = hs300.T.iloc[0]
 
-        self.__trans = self.initTrans('./backtests/20060104_20160104.trans.csv')
+        self.__trans = self.initTrans('./backtests/' + start + '_' + end + '.trans.csv')
 
     def initRets(self, fname, symbol, attr):
         df = pd.read_csv(fname, index_col=0)
