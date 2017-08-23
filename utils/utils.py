@@ -968,7 +968,7 @@ class FakeTrade(object):
 
         forcetp  = self.__forcetp 
         
-        for i in range(startcnt, endcnt + 1):
+        for i in range(startcnt, endcnt):
             nday  = self.__mapday[i] 
             yday  = self.__mapday[i - 1] 
             nxday = self.__mapday[i + 1]
@@ -1023,8 +1023,8 @@ class FakeTrade(object):
                 else:
                     if t[0] in self.__holds:
                         print 'DEBUG:', nday, 'Drop Holded', t[0], t[1], t[2], nxday
-        tdetail = self.trackZH(end,retslog)
-        self.printTable(retslog, tdetail, end)
+        tdetail = self.trackZH(end, retslog)
+        self.printTable(retslog, tdetail, end, forcetp)
         print '...........FINISHED........'
 
     def calShares(self, bp, maxzuhe, nday):
@@ -1053,7 +1053,7 @@ class FakeTrade(object):
         return shares
 
     # ------------- PRINT INFO ---------------------#
-    def printTable(self, retslog, tdetail, nday):
+    def printTable(self, retslog, tdetail, nday, forcetp):
 
         # 历史调仓记录
         (avgholds, total) = self.printSwitch(nday)
@@ -1069,6 +1069,11 @@ class FakeTrade(object):
         (curholds, curuseage, curtotal) = self.printZH(nday, tdetail, zuhe)
 
         # T + 1 day
+        for t in tups:
+            (flag, comment, ref) = self.forceDrop(t, nday, forcetp)
+            if flag == 1:
+                print '选股择时:', nday, comment, t[0], t[1], t[2] 
+
         self.printNextDay(nday, tups, zuhe)
         output = zuhe.get_string().encode('utf-8') 
         f = open(self.__btdir + '/' + self.__prefix + '.zuhe.csv', 'w')
