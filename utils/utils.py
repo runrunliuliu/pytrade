@@ -435,6 +435,7 @@ class FakeTrade(object):
         self.__cashused  = 0
 
         self.__btdir  = './backtests'
+        self.__dirs   = dirs
 
         # bear = 1 熊市
         self.__bear   = 0
@@ -1075,7 +1076,6 @@ class FakeTrade(object):
             (flag, comment, ref) = self.forceDrop(t, nday, forcetp)
             if flag == 1:
                 print '选股择时:', nday, comment, t[0], t[1], t[2] 
-
         self.printNextDay(nday, tups, zuhe)
         output = zuhe.get_string().encode('utf-8') 
         f = open(self.__btdir + '/' + self.__prefix + '.zuhe.csv', 'w')
@@ -1085,6 +1085,9 @@ class FakeTrade(object):
         # 历史总收益
         avgholds = (avgholds + curholds) / (total + curtotal + 0.0)
         self.printTotalReturn(retslog, avgholds, curuseage) 
+
+        # 最后一日选股
+        self.triangleSelect(self.__dirs, self.__trade.getName(), forcetp)
 
     def computeStats(self, retslog, ind):
         maxdrawdown = (0.0, None, None)
