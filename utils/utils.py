@@ -968,7 +968,7 @@ class FakeTrade(object):
 
         forcetp  = self.__forcetp 
         
-        for i in range(startcnt, endcnt):
+        for i in range(startcnt, endcnt + 1):
             nday  = self.__mapday[i] 
             yday  = self.__mapday[i - 1] 
             nxday = self.__mapday[i + 1]
