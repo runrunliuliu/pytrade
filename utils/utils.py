@@ -704,6 +704,7 @@ class FakeTrade(object):
         ret     = 0
         comment = ''
         ref     = -1
+        print 'DEBUG:上证择时', nday, tp
         if tp == 5 and self.__bearma == 1:
             comment = 'No Buy Bear_Market_MA_WORSE'
             ret = 1
