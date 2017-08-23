@@ -827,15 +827,15 @@ class FakeTrade(object):
             (ret, comment, ref) = self.sztime(nday, tp)
         if tp == 7 or tp == 8:
             if tp == 7:
-                szret = self.sztime(nday, 5)
+                (szret, comment, ref) = self.sztime(nday, 5)
                 if szret[0] == 1:
-                    return szret
+                    return (szret, comment, ref)
                 else:
                     (ret, comment, ref) = self.mtime(code, nday, tp, nxday)
             if tp == 8:
-                szret = self.sztime(nday, 6)
+                (szret, comment, ref) = self.sztime(nday, 6)
                 if szret[0] == 1:
-                    return szret
+                    return (szret, comment, ref)
                 else:
                     (ret, comment, ref) = self.mtime(code, nday, tp, nxday)
         return (ret, comment, ref)
