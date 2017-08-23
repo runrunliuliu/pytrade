@@ -45,6 +45,6 @@ rsync -uhavzm --stats --progress tmp/$day0.done  himalayas@139.129.99.51:/data/f
 rsync -uhavzm --stats --progress tmp/$day0.dayk.tar.gz  himalayas@192.168.200.20:/data/from_offline/kline_shape/
 rsync -uhavzm --stats --progress tmp/$day0.done  himalayas@192.168.200.20:/data/from_offline/kline_shape/
 
-nohup $py pp_selstock.py -m 'mock' -s 2016-08-01 -d $day0 -t triangle 1>logs/$day0.triangle.log 2>&1 &
+nohup $py pp_selstock.py -m 'mock' -s 2017-01-03 -d $day0 -t triangle 1>logs/$day0.triangle.log 2>&1 &
 
 scp data/dayk/* himalayas@192.168.200.11:/data/server/nfsclient/stock/dayk/ 1>upload.log 2>&1
