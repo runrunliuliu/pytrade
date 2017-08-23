@@ -578,9 +578,6 @@ class FakeTrade(object):
             self.__bear   = int(self.__mtime[bbkey][2])
             self.__bearma = int(self.__mtime[bbkey][3])
             tkdk = float(self.__mtime[bbkey][19])
-            # qsxt = float(self.__mtime[bbkey][8])
-            # vret = float(self.__mtime[bbkey][9])
-            # pret = float(self.__mtime[bbkey][12])
             if tkdk < 0.0 and ddif < 0:
                 self.__openHD = 0 
             else:
@@ -704,7 +701,6 @@ class FakeTrade(object):
         ret     = 0
         comment = ''
         ref     = -1
-        print 'DEBUG:上证择时', nday, tp
         if tp == 5 and self.__bearma == 1:
             comment = 'No Buy Bear_Market_MA_WORSE'
             ret = 1
@@ -880,7 +876,6 @@ class FakeTrade(object):
             if check is False:
                 continue
             (flag, comment, ref) = self.forceDrop(t, nday, forcetp)
-            print 'DEBUG:', nday, flag, comment
             if flag == 1:
                 print 'DEBUG:', nday, comment, t[0], t[1], t[2]
                 continue
