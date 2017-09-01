@@ -276,7 +276,7 @@ class DumpFeature(object):
                 '10xingtai,11vret,12vscore,13nvpos,14pret,15pscore,16nppos,17slope,'  + \
                 '18dma250,19pma250,20prext,21tkdk,22tkdf,23ma20GD,24lfbl,25lfblhi,26lfblcl,27qsell,' + \
                 '28md5120,29tfbl,30fibs,31bias5120,32fbprice,33fbpress,34bddf,35goldseg,' + \
-                '36ma5d,37peekzl,38pqs,39nqs\n')
+                '36ma5d,37peekzl,38pqs,39nqs,40phat1\n')
         for cx in self.__cxshort:
             k = cx[0]
             v = cx[1]
@@ -736,6 +736,8 @@ class FakeTrade(object):
             gfbeili = float(self.__mtime[bbkey][6])
             gfscore = float(self.__mtime[bbkey][7])
             
+            ddea = float(self.__mtime[bbkey][1])
+
             qsxt = float(self.__mtime[bbkey][8])
             vret = float(self.__mtime[bbkey][9])
             pret = float(self.__mtime[bbkey][12])
@@ -751,6 +753,10 @@ class FakeTrade(object):
             pqs   = self.__mtime[bbkey][36]
             nqs   = self.__mtime[bbkey][37]
             comqs = str(pqs) + '|' + str(nqs) 
+
+            leftpeek = float(self.__mtime[bbkey][38])
+            nclose   = float(self.__clset[bbkey])
+            nhigh    = float(self.__hiset[bbkey])
 
             # -------------- 买入 ---------------------------
             if tp == 1 and self.__bear == 1 and yby < -0.02:
@@ -773,33 +779,42 @@ class FakeTrade(object):
                 comment = 'No Buy ALL_Market_' + comxt
                 ret = 1
                 return (ret, comment, ref)
+
+            # TEST
+            # ratio = nclose / leftpeek
+            # if tp == 7 and (ratio >=0.95 and ratio <= 1.05):
+            #     comment = 'No Buy AROUND_PEEK_HAT'
+            #     ret = 1
+            #     return (ret, comment, ref)
+            # TEST END
+
             if comqs == '1302.0|2303.0':
                 comment = 'No Buy ALL_Market_COMQS_' + comqs
                 ret = 1
                 return (ret, comment, ref)
 
-        # -------------- 调仓 ---------------------------
-        if tp == 8 and self.__bear == 1 and ((vret + pret) == 2 or (qsxt == 202 and (vret + pret) == 1)):
-            comment = 'No Hold Bear_Market_TurnInto_' + str(qsxt)
-            ret = 1
-            return (ret, comment, ref)
-        if tp == 8 and self.__bear == 1 and tkdk < 0.0:
-            comment = 'No Hold Bear_Market_TKDK_' + str(tkdk)
-            ret = 1
-            return (ret, comment, ref)
+            # -------------- 调仓 ---------------------------
+            if tp == 8 and self.__bear == 1 and ((vret + pret) == 2 or (qsxt == 202 and (vret + pret) == 1)):
+                comment = 'No Hold Bear_Market_TurnInto_' + str(qsxt)
+                ret = 1
+                return (ret, comment, ref)
+            if tp == 8 and self.__bear == 1 and tkdk < 0.0:
+                comment = 'No Hold Bear_Market_TKDK_' + str(tkdk)
+                ret = 1
+                return (ret, comment, ref)
 
-        if tp == 2 and self.__bear == 1 and yby < -0.02:
-            if nday in self.__tradesignal:
-                tups = self.__tradesignal[nday] 
-                for t in tups: 
-                    if code == t[0]:
-                        comment = 'No Hold Bear_Market_YBY'
-                        ret = 1
-                        return (ret, comment, ref)
-        if tp == 2 and self.__bear == 1 and gfbeili > 0 and gfscore > 2.0:
-            comment = 'No Hold GeFeng_BeiLI'
-            ret = 2 
-            return (ret, comment, gfbeili)
+            if tp == 2 and self.__bear == 1 and yby < -0.02:
+                if nday in self.__tradesignal:
+                    tups = self.__tradesignal[nday] 
+                    for t in tups: 
+                        if code == t[0]:
+                            comment = 'No Hold Bear_Market_YBY'
+                            ret = 1
+                            return (ret, comment, ref)
+            if tp == 2 and self.__bear == 1 and gfbeili > 0 and gfscore > 2.0:
+                comment = 'No Hold GeFeng_BeiLI'
+                ret = 2 
+                return (ret, comment, gfbeili)
         return (ret, comment, ref)
 
     def qSell(self, tup, nday, tp):
