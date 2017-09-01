@@ -1,3 +1,4 @@
+# coding:utf-8
 import json
 from urlparse import urlparse
 import re
@@ -46,7 +47,7 @@ class dbimport:
         return jout
 
     # Parse Feature List 
-    def parseFT(self, path):
+    def parseFT(self, path, mode=0):
         def getflag(flag):
             out = dict()
             arr = flag.split(',')
@@ -73,10 +74,15 @@ class dbimport:
         jout  = []
         flags = dict()
         for line in open(path):
+            key = {}
             out = {}
             (day, flag) = line.strip().split(' ')
-            
-            out['day'] = day
+           
+            if mode == 1:
+                key['day'] = day
+            else:
+                out['day'] = day
+
             fdict = getflag(flag)    
             if day in inday:
                 ind = inday[day]
@@ -86,12 +92,42 @@ class dbimport:
                     (k, v) = kv.split(':')
                     k = 'f' + k
                     if k in fdict and v != '1024201' and k in fname:
-                        out['fid']    = fname[k][0]
+                        fid = fname[k][0]
+                        
+                        if mode == 1:
+                            key['fid'] = fid
+                        else:
+                            out['fid']     = fid 
+
                         out['fname']  = fname[k][1]
                         out['val']    = v
+
+                        out['shows']  = v
+                        if fid == 'td1' or fid == 'macd2' or fid == 'zdf1' \
+                                or fid == 'zdf2' or fid == 'zdf3' or fid == 'zdf4' \
+                                or fid == 'zdf5' or fid == 'zdf6' \
+                                or fid == 'sxy4' or fid == 'sxy5' or fid == 'sxy1' \
+                                or fid == 'sxy2' or fid == 'sxy3' or fid == 'sxy6':
+                            if v == '1':
+                                out['shows'] = '是'
+                            if v == '0':
+                                out['shows'] = '否'
+                        if fid == 'td2' or fid == 'cybdf' or fid == 'rz5gd' or fid == 'd5b' \
+                                or fid == 'macd6' or fid == 'macd7' or fid == 'zd5b' \
+                                or fid == 'z5b' or fid == 'rzb' or fid == 'z5djfd' \
+                                or fid == 'szb' or fid == 'szdf' or fid == 'macd8' or fid == 'zlbrz':
+                            x1 = round(float(v) * 100, 3)
+                            if x1 > 0.0:
+                                out['shows'] = str(x1) + '%'
+                            else:
+                                out['shows'] = str(x1)
                         out['status'] = fdict[k]
                         out['uptime'] = str(self.uptime)
-                        jout.append(json.dumps(out))
+
+                        if mode == 1:
+                            jout.append((json.dumps(key), json.dumps(out)))
+                        else:
+                            jout.append(json.dumps(out))
         return jout
 
     # Parse Dapan Baodie
@@ -139,6 +175,7 @@ class dbimport:
 
     def import2db(self,table,action,data):
         cursor = self.db.cursor()
+
         if action == 'replace':
             for d in data:
                 d = json.loads(d)
@@ -147,6 +184,27 @@ class dbimport:
                     sql = sql + "`" +  k + "`='" + d[k] + "',"
                 sql = 'REPLACE INTO ' + table + ' SET ' +  sql
                 sql = re.sub(',$',';',sql).encode("utf8")
+                print sql
+                cursor.execute(sql)
+                self.db.commit()
+
+        if action == 'update':
+            for d in data:
+                key = d[0]
+                val = d[1]
+                K = json.loads(key)
+                cond = [] 
+                for k in K.keys():
+                    cond.append("`" + k + "`='" + K[k] + "'")
+                cond = ' and '.join(cond)
+                
+                sel = [] 
+                V = json.loads(val)
+                for v in V.keys():
+                    sel.append("`" + v + "`='" + V[v] + "'")
+                sel = ','.join(sel)
+
+                sql = 'UPDATE ' + table + ' SET ' + sel + ' where ' + cond + ';'
                 print sql
                 cursor.execute(sql)
                 self.db.commit()
