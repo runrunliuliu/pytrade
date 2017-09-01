@@ -37,6 +37,10 @@ def parseopt(argv):
 
     return[dbserv, inputfile, table, action, uptime]
 
+def update(db,table,action,inputfile):
+    if table == 'tb_dapan_bd_day_feature_list':
+        jout = db.parseFT(inputfile, mode=1)
+        db.import2db(table,action,jout)
 
 def replace(db,table,action,inputfile):
     if table == 'guping':
@@ -79,10 +83,15 @@ def replace(db,table,action,inputfile):
 
 def main(argv):
     [dbserv, inputfile, table, action, uptime] = parseopt(argv)
+
     if action == 'replace':
         db = dbimport(dbserv, uptime)
         replace(db, table, action, inputfile)
-        
+ 
+    if action == 'update':
+        db = dbimport(dbserv, uptime)
+        update(db, table, action, inputfile)
+       
     if action == 'fetchall':
         db = dbexport()
         db.fetchAll()
