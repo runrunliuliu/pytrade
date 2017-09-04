@@ -117,7 +117,7 @@ class dbimport:
                                 or fid == 'z5b' or fid == 'rzb' or fid == 'z5djfd' \
                                 or fid == 'szb' or fid == 'szdf' or fid == 'macd8' or fid == 'zlbrz':
                             x1 = round(float(v) * 100, 3)
-                            if x1 > 0.0:
+                            if abs(x1) > 0.0:
                                 out['shows'] = str(x1) + '%'
                             else:
                                 out['shows'] = str(x1)
