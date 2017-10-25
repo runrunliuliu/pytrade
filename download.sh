@@ -11,6 +11,7 @@ python download.py $day0
 # scp himalayas@139.129.99.51:/home/himalayas/apps2/qts/pytrade2/data/dayk/* ./data/dayk/
 rsync -uhavzm --stats --progress himalayas@139.129.99.51:/home/himalayas/apps2/qts/pytrade2/data/dayk.tar.gz .
 tar -zxvf dayk.tar.gz
+rsync -uhavzm --stats --progress himalayas@139.129.99.51:/home/himalayas/apps2/qts/pytrade2/data/bk.tar.gz .
 
 # scp multiple period data
 mkdir -p data/tmp/
